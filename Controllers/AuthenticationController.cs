@@ -39,8 +39,8 @@ public class AuthenticationController : Controller
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                new Claim("title", login.Title),
-                new Claim("pin", login.Pin)
+                new("title", login.Title),
+                new("pin", login.Pin)
                 }),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials
