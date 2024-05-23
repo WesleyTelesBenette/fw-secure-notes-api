@@ -9,7 +9,7 @@ public class FileModel
     [Key]
     public ushort Id { get; set; }
 
-    [MaxLength(24)]
+    [MaxLength(48)]
     public string Title { get; set; } = string.Empty;
 
     [Required]

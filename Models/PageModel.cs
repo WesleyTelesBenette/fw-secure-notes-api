@@ -9,9 +9,12 @@ public class PageModel
     public uint Id { get; set; }
 
     [Required]
+    [MaxLength(25)]
     public string Title { get; set; }
 
     [Required]
+    [MaxLength(3)]
+    [RegularExpression(@"^[a-zA-Z0-9\-]*$")]
     public string Pin { get; set; }
 
     public string Password { get; set; } = "";
