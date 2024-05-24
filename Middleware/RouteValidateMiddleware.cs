@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace fw_secure_notes_api.Middleware;
 
@@ -15,8 +16,8 @@ public class RouteValidateMiddleware
     {
         var routeVars = context.Request.RouteValues;
 
-        routeVars.TryGetValue("title", out var routeTitle);
-        routeVars.TryGetValue("pin",   out var routePin);
+        var routeTitle = routeVars.GetValueOrDefault("title");
+        var routePin = routeVars.GetValueOrDefault("pin");
 
         bool isTitleValid = (routeTitle != null) && (routeTitle.ToString()!.Length <= 25);
         bool isPinValid   = (routePin != null)   && (Regex.IsMatch(routePin.ToString()!, @"^[a-zA-Z0-9\-]*$") == true);
