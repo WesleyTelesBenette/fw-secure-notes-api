@@ -9,6 +9,8 @@ using System.Text;
 
 namespace fw_secure_notes_api.Controllers;
 
+[ApiController]
+[Route("[controler]")]
 public class AuthenticationController : Controller
 {
     private readonly PageRepository _page;
