@@ -1,4 +1,6 @@
 using fw_secure_notes_api.Data;
+using fw_secure_notes_api.Filters;
+using fw_secure_notes_api.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -30,6 +32,10 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+//Filter
+builder.Services.AddScoped<TokenValidateActionFilter>();
+
+//General
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -46,6 +52,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<RouteValidateMiddleware>();
 
 app.MapControllers();
 

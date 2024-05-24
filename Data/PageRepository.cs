@@ -11,6 +11,14 @@ public class PageRepository
         _dbContext = dbContext;
     }
 
+    public async Task<bool> IsPageExist(string title, string pin)
+    {
+        var page = await _dbContext
+            .Pages.FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
+
+        return (page != null);
+    }
+
     public async Task<bool> IsPageValid(string title, string pin, string password)
     {
         var page = await _dbContext.Pages
