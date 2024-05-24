@@ -28,7 +28,6 @@ public class TokenValidateActionFilter : IAsyncActionFilter
             var routePin = routeVars.GetValueOrDefault("pin") ?? "";
             var route = $"{routeTitle}-{routePin}";
 
-
             if ((token == route) && (await _page.IsPageExist(tokenTitle, tokenPin)))
             {
                 await next();
