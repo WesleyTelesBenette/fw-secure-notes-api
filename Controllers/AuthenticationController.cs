@@ -10,7 +10,7 @@ using System.Text;
 namespace fw_secure_notes_api.Controllers;
 
 [ApiController]
-[Route("{title}/{pin}/[controller]")]
+[Route("[controller]")]
 public class AuthenticationController : Controller
 {
     private readonly PageRepository _page;
@@ -22,17 +22,19 @@ public class AuthenticationController : Controller
         _configuration = configuration;
     }
 
+    //[HttpGet]
+    //public async Tasl<IActionResult> IsPageHasPassword() {}
+
     [HttpPost]
-    public async Task<IActionResult> GenerateToken(LoginDto login)
+    public async Task<IActionResult> GenerateToken([FromRoute] string title, [FromRoute] string pin, string password)
     {
         try
         {
-            bool isValidPage = await _page.IsPageValid(login.Title, login.Pin, login.Password);
+            if (!await _page.IsPageExist(title, pin))
+                return NotFound("A página não existe...");
 
-            if (!isValidPage)
-            {
+            if (!await _page.IsPageValid(title, pin, password))
                 return Unauthorized("A senha está incorreta!");
-            }
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]!);
@@ -41,8 +43,8 @@ public class AuthenticationController : Controller
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                new("title", login.Title),
-                new("pin", login.Pin)
+                new("title", title),
+                new("pin", pin)
                 }),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials

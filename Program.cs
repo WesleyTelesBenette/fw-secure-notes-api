@@ -1,3 +1,4 @@
+using fw_secure_notes_api.Conventions;
 using fw_secure_notes_api.Data;
 using fw_secure_notes_api.Filters;
 using fw_secure_notes_api.Middleware;
@@ -36,7 +37,10 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<TokenValidateActionFilter>();
 
 //General
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Conventions.Add(new RouteConvention());
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
