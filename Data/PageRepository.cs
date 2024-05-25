@@ -26,5 +26,16 @@ public class PageRepository
         
         return (page != null) && BCrypt.Net.BCrypt.Verify(password, page.Password);
     }
+
+    public async Task<bool> IsPageHasPassword(string title, string pin)
+    {
+        var page = await _dbContext.Pages
+            .FirstOrDefaultAsync(p =>
+                (p.Title == title) &&
+                (p.Pin == pin) &&
+                (p.Password != null) &&
+                (p.Password != ""));
+
+        return (page != null);
+    }
 }
- 
