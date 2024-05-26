@@ -32,10 +32,8 @@ public class PageRepository
         var page = await _dbContext.Pages
             .FirstOrDefaultAsync(p =>
                 (p.Title == title) &&
-                (p.Pin == pin) &&
-                (p.Password != null) &&
-                (p.Password != ""));
+                (p.Pin == pin));
 
-        return (page != null);
+        return (page != null) && string.IsNullOrEmpty(page.Password);
     }
 }
