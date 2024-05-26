@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using fw_secure_notes_api.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Collections.ObjectModel;
 
 namespace fw_secure_notes_api.Data;
 
@@ -16,7 +19,7 @@ public class PageRepository
         var page = await _dbContext
             .Pages.FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
 
-        return (page != null);
+        return (page != null) && (string.IsNullOrEmpty(page.Title)) && (string.IsNullOrEmpty(page.Pin));
     }
 
     public async Task<bool> IsPageValid(string title, string pin, string password)
@@ -35,5 +38,15 @@ public class PageRepository
                 (p.Pin == pin));
 
         return (page != null) && string.IsNullOrEmpty(page.Password);
+    }
+
+    public async Task<ICollection<FileModel>> GetFileList(string title, string pin)
+    {
+        var page = await _dbContext.Pages
+            .FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
+
+        return (page != null)
+            ? (page.Files)
+            : new List<FileModel>();
     }
 }
