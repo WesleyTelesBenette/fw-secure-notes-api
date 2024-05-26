@@ -22,18 +22,26 @@ public class AuthenticationController : Controller
         _configuration = configuration;
     }
 
-    //[HttpGet]
-    //public async Tasl<IActionResult> IsPageHasPassword() {}
+    [HttpGet]
+    public async Task<IActionResult> IsPageHasPassword([FromRoute] string title, [FromRoute] string pin)
+    {
+        return (await _page.IsPageExist(title, pin))
+            ? Ok(await _page.IsPageHasPassword(title, pin))
+            : NotFound();
+    }
 
     [HttpPost]
-    public async Task<IActionResult> GenerateToken([FromRoute] string title, [FromRoute] string pin, string password)
+    public async Task<IActionResult> GenerateToken
+        ([FromRoute] string title,
+        [FromRoute] string pin,
+        [FromBody] LoginDto login)
     {
         try
         {
             if (!await _page.IsPageExist(title, pin))
                 return NotFound("A página não existe...");
 
-            if (!await _page.IsPageValid(title, pin, password))
+            if (!await _page.IsPageValid(title, pin, login.Password))
                 return Unauthorized("A senha está incorreta!");
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -43,8 +51,8 @@ public class AuthenticationController : Controller
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                new("title", title),
-                new("pin", pin)
+                    new("title", title),
+                    new("pin", pin)
                 }),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials
