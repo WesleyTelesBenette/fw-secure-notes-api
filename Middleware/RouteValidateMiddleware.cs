@@ -19,7 +19,7 @@ public class RouteValidateMiddleware
         var routePin = routeVars.GetValueOrDefault("pin");
 
         bool isTitleValid = (routeTitle != null) && (routeTitle.ToString()!.Length <= 25);
-        bool isPinValid   = (routePin != null)   && (Regex.IsMatch(routePin.ToString()!, @"^[a-zA-Z0-9\-]*$"));
+        bool isPinValid   = (routePin   != null) && (Regex.IsMatch(routePin.ToString()!, @"^[a-zA-Z0-9\-]*$"));
 
         if ((!isTitleValid) || (!isPinValid))
         {
