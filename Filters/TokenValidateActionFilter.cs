@@ -1,6 +1,8 @@
 ﻿using fw_secure_notes_api.Data;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Hosting;
 using System.Security.Claims;
 
 namespace fw_secure_notes_api.Filters;
@@ -25,26 +27,26 @@ public class TokenValidateActionFilter : IAsyncActionFilter
         var tokenTitle = user.Claims.FirstOrDefault(c => c.Type == "title")?.Value;
         var tokenPin   = user.Claims.FirstOrDefault(c => c.Type == "pin")?.Value;
 
-        //(No request POST) && (Not found page)
-        if ((!IsPageIsBeingCreated(context)) && (!await IsPageExist(routeTitle, routePin)))
+        if (!IsRequestPost(context))
         {
-            context.Result = new NotFoundResult();
-            return;
+            if (!await IsPageExist(routeTitle, routePin))
+            {
+                context.Result = new NotFoundResult();
+                return;
+            }
+
+            if ((!await IsPublicPage(user, routeTitle!, routePin!))
+                && (!IsAuthorizedPage(user, routeTitle!, routePin!, tokenTitle!, tokenPin!)))
+            {
+                context.Result = new UnauthorizedResult();
+                return;
+            }
         }
 
-        //(Page has password) && (Unauthorized page)
-        if ((!await IsPublicPage(user, routeTitle!, routePin!))
-            && (!IsAuthorizedPage(user, routeTitle!, routePin!, tokenTitle!, tokenPin!)))
-        {
-            context.Result = new UnauthorizedResult();
-            return;
-        }
-
-        //All very well :)
         await next();
     }
 
-    private static bool IsPageIsBeingCreated(ActionExecutingContext context)
+    private static bool IsRequestPost(ActionExecutingContext context)
     {
         return (context.HttpContext.Request.Method == HttpMethods.Post);
     }
