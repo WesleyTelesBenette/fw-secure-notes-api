@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using fw_secure_notes_api.Dtos;
 using System.ComponentModel.DataAnnotations;
 
 namespace fw_secure_notes_api.Models;
@@ -24,6 +24,13 @@ public class PageModel
     public ICollection<FileModel> Files { get; set; } = [];
 
     public PageModel() { }
+
+    public PageModel(string title, string pin, string password)
+    {
+        Title = title;
+        Pin = pin;
+        Password = password;
+    }
 }
 
 public enum ThemePage

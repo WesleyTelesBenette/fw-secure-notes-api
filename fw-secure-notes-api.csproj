@@ -13,9 +13,13 @@
 
   <ItemGroup>
     <Compile Remove="Filters\NovaPasta\**" />
+    <Compile Remove="NovaPasta1\**" />
     <Content Remove="Filters\NovaPasta\**" />
+    <Content Remove="NovaPasta1\**" />
     <EmbeddedResource Remove="Filters\NovaPasta\**" />
+    <EmbeddedResource Remove="NovaPasta1\**" />
     <None Remove="Filters\NovaPasta\**" />
+    <None Remove="NovaPasta1\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,7 +37,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="NovaPasta1\" />
     <Folder Include="Resources\" />
   </ItemGroup>
 

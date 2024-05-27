@@ -49,4 +49,24 @@ public class PageRepository
             ? (page.Files)
             : new List<FileModel>();
     }
+
+    public async Task<ICollection<PageModel>> GetPageListWithThisTitle(string title)
+    {
+        return (await _dbContext.Pages.Where(p => p.Title == title).ToListAsync());
+    }
+
+    public async Task<bool> CreatePage(PageModel newPage)
+    {
+        try
+        {
+            await _dbContext.Pages.AddAsync(newPage);
+            int page = await _dbContext.SaveChangesAsync();
+
+            return (page > 0);
+        }
+        catch
+        {
+            return false;
+        }
+    }
 }
