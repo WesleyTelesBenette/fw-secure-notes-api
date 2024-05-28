@@ -17,7 +17,7 @@ public class PageRepository
         var page = await _dbContext
             .Pages.FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
 
-        return (page != null) && (string.IsNullOrEmpty(page.Title)) && (string.IsNullOrEmpty(page.Pin));
+        return (page != null) && (!string.IsNullOrEmpty(page.Title)) && (!string.IsNullOrEmpty(page.Pin));
     }
 
     public async Task<bool> IsPageValid(string title, string pin, string password)
