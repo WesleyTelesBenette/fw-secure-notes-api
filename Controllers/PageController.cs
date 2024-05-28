@@ -9,7 +9,6 @@ namespace fw_secure_notes_api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[ServiceFilter(typeof(TokenValidateActionFilter))]
 public class PageController : Controller
 {
     private readonly PageRepository _page;
@@ -22,6 +21,7 @@ public class PageController : Controller
     }
 
     [HttpGet("files")]
+    [ServiceFilter(typeof(TokenValidateActionFilter))]
     public async Task<IActionResult> GetFileList([FromRoute] string title, [FromRoute] string pin)
     {
         var list = await _page.GetFileList(title, pin);
@@ -42,6 +42,7 @@ public class PageController : Controller
     }
 
     [HttpPut]
+    [ServiceFilter(typeof(TokenValidateActionFilter))]
     public async Task<IActionResult> ChangePageTheme(
         [FromRoute] string title,
         [FromRoute] string pin,
@@ -53,6 +54,7 @@ public class PageController : Controller
     }
 
     [HttpDelete]
+    [ServiceFilter(typeof(TokenValidateActionFilter))]
     public async Task<IActionResult> DeletePage(
         [FromRoute] string title,
         [FromRoute] string pin, 
@@ -68,10 +70,4 @@ public class PageController : Controller
 
         return Unauthorized();
     }
-
-
-    /*
-    public async Task<IActionResult> () { }
-    public async Task<IActionResult> () { }
-    */
 }

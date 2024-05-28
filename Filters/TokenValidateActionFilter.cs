@@ -1,8 +1,6 @@
 ﻿using fw_secure_notes_api.Data;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Hosting;
 using System.Security.Claims;
 
 namespace fw_secure_notes_api.Filters;
@@ -27,20 +25,17 @@ public class TokenValidateActionFilter : IAsyncActionFilter
         var tokenTitle = user.Claims.FirstOrDefault(c => c.Type == "title")?.Value;
         var tokenPin   = user.Claims.FirstOrDefault(c => c.Type == "pin")?.Value;
 
-        if (!IsRequestPost(context))
+        if (!await IsPageExist(routeTitle, routePin))
         {
-            if (!await IsPageExist(routeTitle, routePin))
-            {
-                context.Result = new NotFoundResult();
-                return;
-            }
+            context.Result = new NotFoundResult();
+            return;
+        }
 
-            if ((!await IsPublicPage(user, routeTitle!, routePin!))
-                && (!IsAuthorizedPage(user, routeTitle!, routePin!, tokenTitle!, tokenPin!)))
-            {
-                context.Result = new UnauthorizedResult();
-                return;
-            }
+        if ((!await IsPublicPage(user, routeTitle!, routePin!))
+            && (!IsAuthorizedPage(user, routeTitle!, routePin!, tokenTitle!, tokenPin!)))
+        {
+            context.Result = new UnauthorizedResult();
+            return;
         }
 
         await next();
