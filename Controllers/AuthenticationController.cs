@@ -27,7 +27,7 @@ public class AuthenticationController : Controller
     {
         return (await _page.IsPageExist(title, pin))
             ? Ok(await _page.IsPageHasPassword(title, pin))
-            : NotFound();
+            : NotFound("A página não existe...");
     }
 
     [HttpPost]

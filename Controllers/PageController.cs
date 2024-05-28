@@ -24,11 +24,10 @@ public class PageController : Controller
     [HttpGet("files")]
     public async Task<IActionResult> GetFileList([FromRoute] string title, [FromRoute] string pin)
     {
-        var listFiles = await _page.GetFileList(title, pin);
-
-        return (listFiles.Count > 0)
-            ? Ok(listFiles)
-            : NotFound("A página não existe...");
+        var list = await _page.GetFileList(title, pin);
+        return (list != null)
+            ? Ok()
+            : StatusCode(500);
     }
 
     [HttpPost]
@@ -39,13 +38,39 @@ public class PageController : Controller
 
         return ((pin != null) && (await _page.CreatePage(page)))
             ? Created("", page)
-            : BadRequest("Falha ao criar página!");
+            : StatusCode(500);
     }
 
+    [HttpPut]
+    public async Task<IActionResult> ChangePageTheme(
+        [FromRoute] string title,
+        [FromRoute] string pin,
+        [FromBody] UpdatePageThemeDto newTheme)
+    {
+        return (await _page.UpdateTheme(title, pin, newTheme.Theme))
+            ? Ok()
+            : StatusCode(500);
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> DeletePage(
+        [FromRoute] string title,
+        [FromRoute] string pin, 
+        [FromBody] DeletePageDto newDelete)
+    {
+
+        if (await _page.IsPageValid(title, pin, newDelete.Password))
+        {
+            return (await _page.DeletePage(title, pin, newDelete.Password))
+                ? Ok()
+                : StatusCode(500);
+        }
+
+        return Unauthorized();
+    }
+
+
     /*
-    public async Task<IActionResult> () { }
-    public async Task<IActionResult> () { }
-    public async Task<IActionResult> () { }
     public async Task<IActionResult> () { }
     public async Task<IActionResult> () { }
     */

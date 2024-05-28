@@ -1,7 +1,5 @@
 ﻿using fw_secure_notes_api.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Collections.ObjectModel;
 
 namespace fw_secure_notes_api.Data;
 
@@ -26,7 +24,7 @@ public class PageRepository
     {
         var page = await _dbContext.Pages
             .FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
-        
+
         return (page != null) && BCrypt.Net.BCrypt.Verify(password, page.Password);
     }
 
@@ -40,14 +38,12 @@ public class PageRepository
         return (page != null) && string.IsNullOrEmpty(page.Password);
     }
 
-    public async Task<ICollection<FileModel>> GetFileList(string title, string pin)
+    public async Task<ICollection<FileModel>?> GetFileList(string title, string pin)
     {
         var page = await _dbContext.Pages
             .FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
 
-        return (page != null)
-            ? (page.Files)
-            : new List<FileModel>();
+        return (page?.Files) ?? null;
     }
 
     public async Task<ICollection<PageModel>> GetPageListWithThisTitle(string title)
@@ -63,6 +59,51 @@ public class PageRepository
             int page = await _dbContext.SaveChangesAsync();
 
             return (page > 0);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> UpdateTheme(string title, string pin, ThemePage newTheme)
+    {
+        try
+        {
+            var page = await _dbContext.Pages
+                .FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
+
+            if (page == null)
+                return false;
+
+            page.Theme = newTheme;
+            await _dbContext.SaveChangesAsync();
+            
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> DeletePage(string title, string pin, string password)
+    {
+        try
+        {
+            var page = await _dbContext.Pages
+                .FirstOrDefaultAsync(p =>
+                (p.Title == title)
+                && (p.Pin == pin)
+                && (p.Password == password));
+
+            if (page == null)
+                return false;
+
+            _dbContext.Remove(page);
+            await _dbContext.SaveChangesAsync();
+
+            return true;
         }
         catch
         {
