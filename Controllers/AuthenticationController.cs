@@ -41,7 +41,7 @@ public class AuthenticationController : Controller
             if (!await _page.IsPageExist(title, pin))
                 return NotFound("A página não existe...");
 
-            if (!await _page.IsPageValid(title, pin, login.Password ?? ""))
+            if (!await _page.IsPageValid(title, pin, login.Password))
                 return Unauthorized("A senha está incorreta!");
 
             var tokenHandler = new JwtSecurityTokenHandler();
