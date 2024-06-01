@@ -1,6 +1,5 @@
 ﻿using fw_secure_notes_api.Attributes;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using System.Reflection.Metadata;
 using System.Text.RegularExpressions;
 
 namespace fw_secure_notes_api.Middleware;
