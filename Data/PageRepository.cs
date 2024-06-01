@@ -35,20 +35,20 @@ public class PageRepository
                 (p.Title == title) &&
                 (p.Pin == pin));
 
-        return (page != null) && string.IsNullOrEmpty(page.Password);
+        return (page != null) && (!string.IsNullOrEmpty(page.Password));
     }
 
-    public async Task<ICollection<FileModel>?> GetFileList(string title, string pin)
+    public async Task<ICollection<FileModel>> GetFileList(string title, string pin)
     {
         var page = await _dbContext.Pages
             .FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
 
-        return (page?.Files) ?? null;
+        return (page?.Files) ?? [];
     }
 
     public async Task<ICollection<PageModel>> GetPageListWithThisTitle(string title)
     {
-        return (await _dbContext.Pages.Where(p => p.Title == title).ToListAsync());
+        return (await _dbContext.Pages.Where(p => p.Title == title).ToListAsync()) ?? [];
     }
 
     public async Task<bool> CreatePage(PageModel newPage)
@@ -87,15 +87,14 @@ public class PageRepository
         }
     }
 
-    public async Task<bool> DeletePage(string title, string pin, string password)
+    public async Task<bool> DeletePage(string title, string pin)
     {
         try
         {
             var page = await _dbContext.Pages
                 .FirstOrDefaultAsync(p =>
                 (p.Title == title)
-                && (p.Pin == pin)
-                && (p.Password == password));
+                && (p.Pin == pin));
 
             if (page == null)
                 return false;

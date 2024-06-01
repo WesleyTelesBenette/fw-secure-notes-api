@@ -1,5 +1,4 @@
-﻿using fw_secure_notes_api.Dtos;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace fw_secure_notes_api.Models;
 

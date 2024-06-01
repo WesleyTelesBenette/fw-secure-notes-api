@@ -13,9 +13,9 @@ namespace fw_secure_notes_api.Controllers;
 public class PageController : Controller
 {
     private readonly PageRepository _page;
-    private readonly GeneratePin _gnPin;
+    private readonly GeneratePinService _gnPin;
 
-    public PageController(PageRepository page, GeneratePin gnPin)
+    public PageController(PageRepository page, GeneratePinService gnPin)
     {
         _page = page;
         _gnPin = gnPin;
