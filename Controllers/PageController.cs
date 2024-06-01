@@ -22,6 +22,30 @@ public class PageController : Controller
         _gnPin = gnPin;
     }
 
+    [HttpGet("themes")]
+    [NoParameters]
+    public IActionResult GetThemeList()
+    {
+        var values = Enum.GetValues(typeof(ThemePage)).Cast<ThemePage>().ToList();
+        var themeListLength = values.Count;
+
+        Dictionary<byte, string> themeList = [];
+
+        for (byte c = 0; c < themeListLength; c++)
+            themeList.Add(c, values[c].ToString());
+        
+        return Ok(new { themes = themeList });
+    }
+
+    [HttpGet("theme")]
+    [ServiceFilter(typeof(TokenValidateActionFilter))]
+    public async Task<IActionResult> GetPageTheme([FromRoute] string title, [FromRoute] string pin)
+    {
+        var theme = await _page.GetPageTheme(title, pin);
+
+        return Ok(theme);
+    }
+
     [HttpGet("files")]
     [ServiceFilter(typeof(TokenValidateActionFilter))]
     public async Task<IActionResult> GetFileList([FromRoute] string title, [FromRoute] string pin)
