@@ -38,7 +38,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddScoped<TokenValidateActionFilter>();
 
 //My Class
-builder.Services.AddScoped<GeneratePin>();
+builder.Services.AddScoped<GeneratePinService>();
 builder.Services.AddScoped<GenerateTokenService>();
 
 //General
