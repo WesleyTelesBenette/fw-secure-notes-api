@@ -22,8 +22,8 @@ public class TokenValidateActionFilter : IAsyncActionFilter
         var routeTitle = routeVars.GetValueOrDefault("title")?.ToString();
         var routePin   = routeVars.GetValueOrDefault("pin")?.ToString();
 
-        var tokenTitle = user.Claims.FirstOrDefault(c => c.Type == "title")?.Value;
-        var tokenPin   = user.Claims.FirstOrDefault(c => c.Type == "pin")?.Value;
+        var tokenTitle = user.Claims.FirstOrDefault(c => c.Type == "Title")?.Value ?? "";
+        var tokenPin   = user.Claims.FirstOrDefault(c => c.Type == "Pin")?.Value ?? "";
 
         if (!await IsPageExist(routeTitle, routePin))
         {
@@ -31,7 +31,7 @@ public class TokenValidateActionFilter : IAsyncActionFilter
             return;
         }
 
-        if ((!await IsPublicPage(user, routeTitle!, routePin!))
+        if ((!await IsPublicPage(routeTitle!, routePin!))
             && (!IsAuthorizedPage(user, routeTitle!, routePin!, tokenTitle!, tokenPin!)))
         {
             context.Result = new UnauthorizedResult();
@@ -39,11 +39,6 @@ public class TokenValidateActionFilter : IAsyncActionFilter
         }
 
         await next();
-    }
-
-    private static bool IsRequestPost(ActionExecutingContext context)
-    {
-        return (context.HttpContext.Request.Method == HttpMethods.Post);
     }
 
     public async Task<bool> IsPageExist(string? routeTitle, string? routePin)
@@ -54,11 +49,9 @@ public class TokenValidateActionFilter : IAsyncActionFilter
             && (await _page.IsPageExist(routeTitle, routePin));
     }
 
-    private async Task<bool> IsPublicPage(ClaimsPrincipal user, string title, string pin)
+    private async Task<bool> IsPublicPage(string title, string pin)
     {
-        return
-            (user.Identity == null)
-            && (!await _page.IsPageHasPassword(title, pin));
+        return (!await _page.IsPageHasPassword(title, pin));
     }
 
     private static bool IsAuthorizedPage(ClaimsPrincipal user, string routeTitle, string routePin, string tokenTitle, string tokenPin)
