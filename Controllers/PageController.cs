@@ -36,8 +36,7 @@ public class PageController : Controller
     {
         PageModel page = new
         (
-            title,
-            await _gnPin.Generate(title),
+            title, await _gnPin.Generate(title),
             BCrypt.Net.BCrypt.HashPassword(newPage.Password)
         );
 
@@ -48,22 +47,33 @@ public class PageController : Controller
 
     [HttpPut("theme")]
     [ServiceFilter(typeof(TokenValidateActionFilter))]
-    public async Task<IActionResult> ChangePageTheme(
-        [FromRoute] string title,
-        [FromRoute] string pin,
-        [FromBody] UpdatePageThemeDto newTheme)
+    public async Task<IActionResult> ChangePageTheme
+        ([FromRoute] string title, [FromRoute] string pin, [FromBody] UpdatePageThemeDto newTheme)
     {
         return (await _page.UpdateTheme(title, pin, newTheme.Theme))
             ? Ok()
             : StatusCode(500, "Ocorreu um erro inesperado no servidor.");
     }
 
+    [HttpPut("password")]
+    [ServiceFilter(typeof(TokenValidateActionFilter))]
+    public async Task<IActionResult> ChangePagePassword
+        ([FromRoute] string title, [FromRoute] string pin, [FromBody] UpdatePagePasswordDto newPassword)
+    {
+        if (await _page.IsPageValid(title, pin, newPassword.OldPassword))
+        {
+            return (await _page.UpdatePassword(title, pin, newPassword.NewPassword))
+                ? Ok()
+                : StatusCode(500, "Ocorreu um erro inesperado no servidor.");
+        }
+
+        return Unauthorized();
+    }
+
     [HttpDelete]
     [ServiceFilter(typeof(TokenValidateActionFilter))]
-    public async Task<IActionResult> DeletePage(
-        [FromRoute] string title,
-        [FromRoute] string pin, 
-        [FromBody] DeletePageDto newDelete)
+    public async Task<IActionResult> DeletePage
+        ([FromRoute] string title, [FromRoute] string pin, [FromBody] DeletePageDto newDelete)
     {
         if (await _page.IsPageValid(title, pin, newDelete.Password))
         {

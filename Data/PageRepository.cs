@@ -1,5 +1,7 @@
-﻿using fw_secure_notes_api.Models;
+﻿using fw_secure_notes_api.Dtos;
+using fw_secure_notes_api.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Net.NetworkInformation;
 
 namespace fw_secure_notes_api.Data;
 
@@ -77,6 +79,27 @@ public class PageRepository
                 return false;
 
             page.Theme = newTheme;
+            await _dbContext.SaveChangesAsync();
+            
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> UpdatePassword(string title, string pin, string newPassword)
+    {
+        try
+        {
+            var page = await _dbContext.Pages
+                .FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
+
+            if (page == null)
+                return false;
+
+            page.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
             await _dbContext.SaveChangesAsync();
             
             return true;
