@@ -1,4 +1,5 @@
-﻿using fw_secure_notes_api.Data;
+﻿using fw_secure_notes_api.Attributes;
+using fw_secure_notes_api.Data;
 using fw_secure_notes_api.Dtos;
 using fw_secure_notes_api.Filters;
 using fw_secure_notes_api.Models;
@@ -31,12 +32,14 @@ public class PageController : Controller
     }
 
     [HttpPost]
+    [NoParameters]
     [AllowAnonymous]
-    public async Task<IActionResult> CreatePage([FromRoute] string title, [FromBody] CreatePageDto newPage)
+    public async Task<IActionResult> CreatePage([FromBody] CreatePageDto newPage)
     {
         PageModel page = new
         (
-            title, await _gnPin.Generate(title),
+            newPage.Title,
+            await _gnPin.Generate(newPage.Title),
             BCrypt.Net.BCrypt.HashPassword(newPage.Password)
         );
 

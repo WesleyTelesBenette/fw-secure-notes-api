@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using fw_secure_notes_api.Attributes;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace fw_secure_notes_api.Conventions;
@@ -16,12 +17,20 @@ public class RouteConvention : IApplicationModelConvention
     {
         foreach (var controller in application.Controllers)
         {
-            foreach (var selector in controller.Selectors)
+            foreach (var action in controller.Actions)
             {
-                selector.AttributeRouteModel = (selector.AttributeRouteModel == null)
-                    ? _centralPrefix
-                    : AttributeRouteModel
-                        .CombineAttributeRouteModel(_centralPrefix,selector.AttributeRouteModel);
+                if (action.Attributes.OfType<NoParameters>().Any())
+                {
+                    continue;
+                }
+
+                foreach (var selector in action.Selectors)
+                {
+                    selector.AttributeRouteModel = (selector.AttributeRouteModel == null)
+                        ? _centralPrefix
+                        : AttributeRouteModel
+                            .CombineAttributeRouteModel(_centralPrefix, selector.AttributeRouteModel);
+                }
             }
         }
     }

@@ -12,12 +12,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Conventions\NovaPasta1\**" />
+    <Compile Remove="Conventions\NovaPasta\**" />
     <Compile Remove="Filters\NovaPasta\**" />
     <Compile Remove="NovaPasta1\**" />
+    <Content Remove="Conventions\NovaPasta1\**" />
+    <Content Remove="Conventions\NovaPasta\**" />
     <Content Remove="Filters\NovaPasta\**" />
     <Content Remove="NovaPasta1\**" />
+    <EmbeddedResource Remove="Conventions\NovaPasta1\**" />
+    <EmbeddedResource Remove="Conventions\NovaPasta\**" />
     <EmbeddedResource Remove="Filters\NovaPasta\**" />
     <EmbeddedResource Remove="NovaPasta1\**" />
+    <None Remove="Conventions\NovaPasta1\**" />
+    <None Remove="Conventions\NovaPasta\**" />
     <None Remove="Filters\NovaPasta\**" />
     <None Remove="NovaPasta1\**" />
   </ItemGroup>
