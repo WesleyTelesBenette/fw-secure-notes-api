@@ -67,9 +67,13 @@ public class PageController : Controller
             BCrypt.Net.BCrypt.HashPassword(newPage.Password)
         );
 
-        return ((page.Pin != null) && (await _page.CreatePage(page)))
-            ? Created("", page)
-            : StatusCode(500, "Ocorreu um erro inesperado no servidor.");
+        if ((page.Pin != null) && (await _page.CreatePage(page)))
+        {
+            page.Password = "***";
+            return Created("", page);
+        }
+
+        return StatusCode(500, "Ocorreu um erro inesperado no servidor.");
     }
 
     [HttpPut("theme")]
