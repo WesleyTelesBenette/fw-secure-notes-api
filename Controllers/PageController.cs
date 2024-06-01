@@ -3,6 +3,7 @@ using fw_secure_notes_api.Dtos;
 using fw_secure_notes_api.Filters;
 using fw_secure_notes_api.Models;
 using fw_secure_notes_api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace fw_secure_notes_api.Controllers;
@@ -24,24 +25,28 @@ public class PageController : Controller
     [ServiceFilter(typeof(TokenValidateActionFilter))]
     public async Task<IActionResult> GetFileList([FromRoute] string title, [FromRoute] string pin)
     {
-        var list = await _page.GetFileList(title, pin);
-        return (list != null)
-            ? Ok()
-            : StatusCode(500);
+        ICollection<FileModel> fileList = await _page.GetFileList(title, pin);
+
+        return Ok(fileList);
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> CreatePage([FromRoute] string title, [FromBody] CreatePageDto newPage)
     {
-        string pin = await _gnPin.Generate(title);
-        PageModel page = new(title, pin, newPage.Password);
+        PageModel page = new
+        (
+            title,
+            await _gnPin.Generate(title),
+            BCrypt.Net.BCrypt.HashPassword(newPage.Password)
+        );
 
-        return ((pin != null) && (await _page.CreatePage(page)))
+        return ((page.Pin != null) && (await _page.CreatePage(page)))
             ? Created("", page)
-            : StatusCode(500);
+            : StatusCode(500, "Ocorreu um erro inesperado no servidor.");
     }
 
-    [HttpPut]
+    [HttpPut("theme")]
     [ServiceFilter(typeof(TokenValidateActionFilter))]
     public async Task<IActionResult> ChangePageTheme(
         [FromRoute] string title,
@@ -50,7 +55,7 @@ public class PageController : Controller
     {
         return (await _page.UpdateTheme(title, pin, newTheme.Theme))
             ? Ok()
-            : StatusCode(500);
+            : StatusCode(500, "Ocorreu um erro inesperado no servidor.");
     }
 
     [HttpDelete]
@@ -60,10 +65,9 @@ public class PageController : Controller
         [FromRoute] string pin, 
         [FromBody] DeletePageDto newDelete)
     {
-
         if (await _page.IsPageValid(title, pin, newDelete.Password))
         {
-            return (await _page.DeletePage(title, pin, newDelete.Password))
+            return (await _page.DeletePage(title, pin))
                 ? Ok()
                 : StatusCode(500);
         }
