@@ -6,13 +6,13 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace fw_secure_notes_api.Migrations
 {
     /// <inheritdoc />
-    public partial class FirstMigrations : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Pages",
+                name: "Page",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -24,7 +24,7 @@ namespace fw_secure_notes_api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Pages", x => x.Id);
+                    table.PrimaryKey("PK_Page", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -34,16 +34,16 @@ namespace fw_secure_notes_api.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Title = table.Column<string>(type: "character varying(48)", maxLength: 48, nullable: false),
-                    Content = table.Column<string>(type: "text", nullable: false),
+                    Content = table.Column<string[]>(type: "text[]", nullable: false),
                     PageId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_File", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_File_Pages_PageId",
+                        name: "FK_File_Page_PageId",
                         column: x => x.PageId,
-                        principalTable: "Pages",
+                        principalTable: "Page",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -61,7 +61,7 @@ namespace fw_secure_notes_api.Migrations
                 name: "File");
 
             migrationBuilder.DropTable(
-                name: "Pages");
+                name: "Page");
         }
     }
 }

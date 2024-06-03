@@ -13,13 +13,19 @@ public class FileModel
     public string Title { get; set; } = string.Empty;
 
     [Required]
-    public string Content { get; set; } = string.Empty;
+    public string[] Content { get; set; } = [];
 
     [Required]
-    [ForeignKey(nameof(FileModel.Page))]
     public uint PageId { get; set; }
 
     public PageModel Page { get; set; }
 
     public FileModel() { }
+
+    public FileModel(string title, uint pageId, PageModel page)
+    {
+        Title = title;
+        PageId = pageId;
+        Page = page;
+    }
 }

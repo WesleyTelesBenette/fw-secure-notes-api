@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace fw_secure_notes_api.Models;
 
+[Table("Page")]
 public class PageModel
 {
     [Key]

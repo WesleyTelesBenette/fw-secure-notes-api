@@ -29,9 +29,9 @@ namespace fw_secure_notes_api.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Content")
+                    b.Property<string[]>("Content")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text[]");
 
                     b.Property<long>("PageId")
                         .HasColumnType("bigint");
@@ -75,7 +75,7 @@ namespace fw_secure_notes_api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Pages");
+                    b.ToTable("Page");
                 });
 
             modelBuilder.Entity("fw_secure_notes_api.Models.FileModel", b =>

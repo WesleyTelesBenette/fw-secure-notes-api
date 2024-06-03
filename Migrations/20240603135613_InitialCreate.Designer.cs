@@ -11,8 +11,8 @@ using fw_secure_notes_api.Data;
 namespace fw_secure_notes_api.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20240523152613_FirstMigrations")]
-    partial class FirstMigrations
+    [Migration("20240603135613_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,9 +32,9 @@ namespace fw_secure_notes_api.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Content")
+                    b.Property<string[]>("Content")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text[]");
 
                     b.Property<long>("PageId")
                         .HasColumnType("bigint");
@@ -78,7 +78,7 @@ namespace fw_secure_notes_api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Pages");
+                    b.ToTable("Page");
                 });
 
             modelBuilder.Entity("fw_secure_notes_api.Models.FileModel", b =>

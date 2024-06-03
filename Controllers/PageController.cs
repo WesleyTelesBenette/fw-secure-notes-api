@@ -48,11 +48,13 @@ public class PageController : Controller
 
     [HttpGet("files")]
     [ServiceFilter(typeof(TokenValidateActionFilter))]
-    public async Task<IActionResult> GetFileList([FromRoute] string title, [FromRoute] string pin)
+    public IActionResult GetFileList([FromRoute] string title, [FromRoute] string pin)
     {
-        ICollection<FileModel> fileList = await _page.GetFileList(title, pin);
-
-        return Ok(fileList);
+        ICollection<string> fileList = _page.GetFileList(title, pin);
+        
+        return (fileList != null)
+            ? Ok(new { Files = fileList })
+            : NoContent();
     }
 
     [HttpPost]

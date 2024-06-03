@@ -1,5 +1,7 @@
 ﻿using fw_secure_notes_api.Models;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using PageModel = fw_secure_notes_api.Models.PageModel;
 
 namespace fw_secure_notes_api.Data;
 
@@ -12,9 +14,16 @@ public class DatabaseContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<PageModel>()
+            .HasMany(p => p.Files)
+            .WithOne(f => f.Page)
+            .HasForeignKey(f => f.PageId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder.Entity<FileModel>()
-            .HasOne(f => f.Page)
-            .WithMany(p => p.Files)
-            .HasForeignKey(f => f.PageId);
+            .Property(f => f.Content)
+            .HasColumnType("text[]");
     }
 }
