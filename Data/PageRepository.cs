@@ -1,5 +1,6 @@
-﻿using fw_secure_notes_api.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using fw_secure_notes_api.Dtos;
+using fw_secure_notes_api.Models;
+using fw_secure_notes_api.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace fw_secure_notes_api.Data;
@@ -42,20 +43,23 @@ public class PageRepository
 
 
     //Gets
-    public async Task<string> GetPageTheme(string title, string pin)
+    public async Task<PageThemeDto?> GetPageTheme(string title, string pin)
     {
         var theme = await _dbContext.Pages
             .FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
 
-        return theme?.Theme.ToString() ?? "";
+        return (theme == null)
+            ? null
+            : new() { ThemeName = theme!.Theme.ToString(), ThemeIndex = theme!.Theme };
     }
 
-    public async Task<ICollection<FileModel>> GetFileList(string title, string pin)
+    public ICollection<string>? GetFileList(string title, string pin)
     {
-        var page = await _dbContext.Pages
-            .FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
+        ICollection<string>? fileList = _dbContext.Files
+            .Where(f => (f.Page.Title == title) && (f.Page.Pin == pin))
+            .OrderBy(f => f.Title).Select(f => f.Title).ToList();
 
-        return (page?.Files) ?? [];
+        return fileList;
     }
 
     public async Task<ICollection<PageModel>> GetPageListWithThisTitle(string title)
@@ -65,87 +69,91 @@ public class PageRepository
 
 
     ///Posts
-    public async Task<bool> CreatePage(PageModel newPage)
+    public async Task<ActionResultService.Results> CreatePage(PageModel newPage)
     {
-        try
-        {
-            await _dbContext.Pages.AddAsync(newPage);
-            int page = await _dbContext.SaveChangesAsync();
+        await _dbContext.Pages.AddAsync(newPage);
+        int save = await _dbContext.SaveChangesAsync();
 
-            return (page > 0);
-        }
-        catch
-        {
-            return false;
-        }
+        return (save > 0)
+            ? ActionResultService.Results.Created
+            : ActionResultService.Results.ServerError;
     }
 
 
     //Puts
-    public async Task<bool> UpdateTheme(string title, string pin, ThemePage newTheme)
+    public async Task<ActionResultService.Results> UpdateTheme(string title, string pin, ThemePage newTheme)
     {
-        try
+        var themeList = Enum.GetValues(typeof(ThemePage)).Cast<ThemePage>().ToList();
+
+        if (!themeList.Contains(newTheme))
         {
             var page = await _dbContext.Pages
                 .FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
 
-            if (page == null)
-                return false;
+            if (page != null)
+            {
+                page.Theme = newTheme;
+                var save = await _dbContext.SaveChangesAsync();
 
-            page.Theme = newTheme;
-            await _dbContext.SaveChangesAsync();
-            
-            return true;
+                return (save > 0)
+                    ? ActionResultService.Results.Update
+                    : ActionResultService.Results.ServerError;
+            }
+
+            return ActionResultService.Results.NotFound;
         }
-        catch
-        {
-            return false;
-        }
+
+        return ActionResultService.Results.Bad;
     }
 
-    public async Task<bool> UpdatePassword(string title, string pin, string newPassword)
+    public async Task<ActionResultService.Results> UpdatePassword(string title, string pin, string oldPassword, string newPassword)
     {
-        try
+        var pageValid = await IsPageValid(title, pin, oldPassword);
+
+        if (pageValid)
         {
             var page = await _dbContext.Pages
                 .FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
 
-            if (page == null)
-                return false;
+            if (page != null)
+            {
+                page.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                var save = await _dbContext.SaveChangesAsync();
 
-            page.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
-            await _dbContext.SaveChangesAsync();
-            
-            return true;
+                return (save > 0)
+                    ? ActionResultService.Results.Update
+                    : ActionResultService.Results.ServerError;
+            }
+
+            return ActionResultService.Results.NotFound;
         }
-        catch
-        {
-            return false;
-        }
+
+        return ActionResultService.Results.Unauthorized;
     }
 
 
     //Deletes
-    public async Task<bool> DeletePage(string title, string pin)
+    public async Task<ActionResultService.Results> DeletePage(string title, string pin, string password)
     {
-        try
+        var pageValid = await IsPageValid(title, pin, password);
+
+        if (pageValid)
         {
             var page = await _dbContext.Pages
-                .FirstOrDefaultAsync(p =>
-                (p.Title == title)
-                && (p.Pin == pin));
+                .FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
 
-            if (page == null)
-                return false;
+            if (page != null)
+            {
+                _dbContext.Remove(page);
+                var save = await _dbContext.SaveChangesAsync();
 
-            _dbContext.Remove(page);
-            await _dbContext.SaveChangesAsync();
-
-            return true;
+                return (save > 0)
+                    ? ActionResultService.Results.Delete
+                    : ActionResultService.Results.ServerError;
+            }
+            return ActionResultService.Results.NotFound;
         }
-        catch
-        {
-            return false;
-        }
+
+        return ActionResultService.Results.Unauthorized;
     }
 }

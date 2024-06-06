@@ -9,60 +9,49 @@ namespace fw_secure_notes_api.Controllers;
 [Route("[controller]")]
 public class AuthenticationController : Controller
 {
-    private readonly PageRepository _page;
+    private readonly AuthenticationRepository _auth;
     private readonly GenerateTokenService _gnrtToken;
+    private readonly ActionResultService _result;
 
     public AuthenticationController
-        (PageRepository pageRepository, GenerateTokenService gnrtToken)
+        (AuthenticationRepository authenticationRepository, GenerateTokenService gnrtToken, ActionResultService result)
     {
-        _page = pageRepository;
+        _auth = authenticationRepository;
         _gnrtToken = gnrtToken;
+        _result = result;
     }
 
     [HttpGet]
-    public async Task<IActionResult> IsPageHasPassword([FromRoute] string title, [FromRoute] string pin)
+    public async Task<IActionResult> GetPageHasPassword([FromRoute] string title, [FromRoute] string pin)
     {
         try
         {
-            return (await _page.IsPageExist(title, pin))
-                ? Ok(await _page.IsPageHasPassword(title, pin))
-                : NotFound("A página não existe...");
+            var isPassword = await _auth.GetPageHasPassword(title, pin);
+
+            return _result.GetAction(ActionResultService.Results.Get, content: isPassword);
         }
         catch (Exception e)
         {
-            return StatusCode(500, new
-            {
-                message = "Ocorreu um erro inesperado no servidor.",
-                details = e.Message
-            });
+            return _result.GetActionAuto(ActionResultService.Results.ServerError, content: e);
         }
     }
 
     [HttpPost]
-    public async Task<IActionResult> GenerateToken
+    public async Task<IActionResult> CreateToken
         ([FromRoute] string title,
         [FromRoute] string pin,
         [FromBody] LoginDto login)
     {
         try
         {
-            if (!await _page.IsPageExist(title, pin))
-                return NotFound("A página não existe...");
-
-            if (!await _page.IsPageValid(title, pin, login.Password))
-                return Unauthorized("A senha está incorreta!");
-
+            var result = await _auth.IsPageValide(title, pin, login.Password);
             string token = _gnrtToken.GenerateToken(title, pin);
 
-            return Ok(new { Token = token });
+            return _result.GetAction(result, content: $"Bearer {token}"); ;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
-            return StatusCode(500, new
-            {
-                message = "Ocorreu um erro inesperado no servidor.",
-                details = e.Message
-            });
+            return _result.GetActionAuto(ActionResultService.Results.ServerError, content: e);
         }
     }
 }

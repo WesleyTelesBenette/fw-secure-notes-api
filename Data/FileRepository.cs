@@ -1,5 +1,8 @@
-﻿using fw_secure_notes_api.Models;
+﻿using fw_secure_notes_api.Dtos;
+using fw_secure_notes_api.Models;
+using fw_secure_notes_api.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace fw_secure_notes_api.Data;
 
@@ -11,120 +14,153 @@ public class FileRepository
         { _dbContext = dbContext; }
 
     //Gets
-    public async Task<FileModel?> GetFile(string title, string pin, int fileIndex)
+    public async Task<FileModelDto?> GetFile(string title, string pin, int fileIndex)
     {
         var fileList = await _dbContext.Files
-            .Where(f => (f.Page.Title == title) && (f.Page.Pin == pin)).ToListAsync();
+            .Where(f => (f.Page.Title == title) && (f.Page.Pin == pin))
+            .OrderBy(f => f.Title)
+            .Select(f => new FileModelDto
+            {
+                Title = f.Title,
+                Content = f.Content
+            })
+            .ToListAsync();
 
-        var file = fileList?[fileIndex] ?? null;
+        if ((fileList.Count > 0) && (fileIndex >= 0) && (fileList.Count > fileIndex))
+        {
+            var fileObject = fileList[fileIndex];
+            return fileObject;
+        }
 
-        return file;
+        return null;
     }
 
-    public async Task<string[]?> GetFileContent(string title, string pin, int fileIndex)
+    public async Task<int> GetFileId(string title, string pin, int fileIndex)
     {
-        var file = await GetFile(title, pin, fileIndex);
+        var fileList = await _dbContext.Files
+            .Where(f => (f.Page.Title == title) && (f.Page.Pin == pin))
+            .OrderBy(f => f.Title).Select(f => f.Id).ToListAsync();
 
-        return (file != null)
-            ? file.Content
-            : [];
+        if ((fileList.Count > 0) && (fileIndex >= 0) && (fileList.Count > fileIndex))
+        {
+            var fileObject = fileList[fileIndex];
+            return fileObject;
+        }
+
+        return -1;
     }
 
 
     //Posts
-    public async Task<bool> CreateFile(string title, string pin, string newFileTitle)
+    public async Task<ActionResultService.Results> CreateFile(string title, string pin, string newFileTitle)
     {
-        try
-        {
-            var page = await _dbContext.Pages
-                .FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
+        var page = await _dbContext.Pages
+            .FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
             
-            if (page != null)
-            {
-                FileModel newFile = new(newFileTitle, page.Id, page);
-                _dbContext.Files.Add(newFile);
-
-                var save = await _dbContext.SaveChangesAsync();
-
-                return ((save) > 0);
-            }
-
-            return false;
-        }
-        catch
+        if (page != null)
         {
-            return false;
+            FileModel newFile = new(newFileTitle, page.Id, page);
+            _dbContext.Files.Add(newFile);
+
+            var save = await _dbContext.SaveChangesAsync();
+
+            return (save > 0)
+                ? ActionResultService.Results.Created
+                : ActionResultService.Results.ServerError;
         }
+
+        return ActionResultService.Results.NotFound;
     }
+
 
     //Puts
-    public async Task<bool> UpdateFileTitle(string title, string pin, int fileIndex, string newTitle)
+    public async Task<ActionResultService.Results> UpdateFileTitle(string title, string pin, int fileIndex, string newTitle)
     {
-        try
-        {
-            var file = await GetFile(title, pin, fileIndex);
+        var fileId = await GetFileId(title, pin, fileIndex);
 
-            if (file != null)
-            {
-                file.Title = newTitle;
-                return ((await _dbContext.SaveChangesAsync()) > 0);
-            }
-            return false;
-        }
-        catch
+        if (fileId != -1)
         {
-            return false;
+            var file = await _dbContext.Files
+                .FirstOrDefaultAsync(f => f.Id == fileId);
+
+            file!.Title = newTitle;
+
+            var save = await _dbContext.SaveChangesAsync();
+
+            return (save > 0)
+                ? ActionResultService.Results.Update
+                : ActionResultService.Results.ServerError;
         }
+
+        return ActionResultService.Results.NotFound;
     }
 
-    public async Task<bool> UpdateFileContent(string title, string pin, int fileIndex, Dictionary<int, string> updateContent)
+    public async Task<ActionResultService.Results> UpdateFileContent(string title, string pin, int fileIndex, Dictionary<int, string?> updateContent)
     {
-        try
+        var fileId = await GetFileId(title, pin, fileIndex);
+
+        if ((fileId != -1))
         {
-            var file = await GetFile(title, pin, fileIndex);
-            
-            if (file != null)
+            var file = await _dbContext.Files
+           .FirstOrDefaultAsync(f => f.Id == fileId);
+
+            int indexDeleteCount = 0;
+
+            foreach (var newLineContent in updateContent)
             {
-                foreach (var newLineContent in updateContent)
+                if (file?.Content.ElementAtOrDefault(newLineContent.Key - indexDeleteCount) == null)
                 {
-                    if (updateContent.Count >= newLineContent.Key)
-                        file.Content[newLineContent.Key] = newLineContent.Value;
+                    if (newLineContent.Value != null)
+                    {
+                        file?.Content.Add(newLineContent.Value);
+                    }
+
+                    continue;
                 }
 
-                var save = await _dbContext.SaveChangesAsync();
+                if (newLineContent.Value == null)
+                {
+                    var list = file!.Content.ToList();
+                    list.RemoveAt(newLineContent.Key - indexDeleteCount);
 
-                return (save > 0);
+                    file!.Content = [.. list];
+                    indexDeleteCount++;
+                    continue;
+                }
+
+                file!.Content[newLineContent.Key - indexDeleteCount] = newLineContent.Value;
             }
 
-            return false;
+            var save = await _dbContext.SaveChangesAsync();
+
+            return (save > 0)
+                ? ActionResultService.Results.Update
+                : ActionResultService.Results.ServerError;
         }
-        catch(Exception ex)
-        {
-            Console.WriteLine(ex.Message, "Erro ao atualizar conteúdo do arquivo...");
-            return false;
-        }
+
+        return ActionResultService.Results.NotFound;
     }
 
+
     //DELETE file
-    public async Task<bool> DeleteFile(string title, string pin, int fileIndex)
+    public async Task<ActionResultService.Results> DeleteFile(string title, string pin, int fileIndex)
     {
-        try
-        {
-            var file = await GetFile(title, pin, fileIndex);
-            var page = await _dbContext.Pages.FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
+        var fileId = await GetFileId(title, pin, fileIndex);
 
-            if ((file != null) && (page != null))
-            {
-                _dbContext.Files.Remove(file);
-                page.Files.Remove(file);
+        var file = await _dbContext.Files
+                .FirstOrDefaultAsync(f => f.Id == fileId);
 
-                return ((await _dbContext.SaveChangesAsync()) > 0);
-            }
-            return false;
-        }
-        catch
+        if ((fileId != -1) && (file != null))
         {
-            return false;
+            _dbContext.Files.Remove(file);
+
+            var save = await _dbContext.SaveChangesAsync();
+
+            return (save > 0)
+                ? ActionResultService.Results.Delete
+                : ActionResultService.Results.ServerError;
         }
+
+        return ActionResultService.Results.NotFound;
     }
 }

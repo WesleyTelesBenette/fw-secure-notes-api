@@ -25,13 +25,6 @@ public class PageModel
     public ICollection<FileModel> Files { get; set; } = [];
 
     public PageModel() { }
-
-    public PageModel(string title, string pin, string password)
-    {
-        Title = title;
-        Pin = pin;
-        Password = password;
-    }
 }
 
 public enum ThemePage

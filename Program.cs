@@ -16,6 +16,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultDatabas
 builder.Services.AddDbContext<DatabaseContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddScoped<PageRepository>();
 builder.Services.AddScoped<FileRepository>();
+builder.Services.AddScoped<AuthenticationRepository>();
+
 
 //JWT
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]!);
@@ -40,6 +42,7 @@ builder.Services.AddScoped<TokenValidateActionFilter>();
 //My Class
 builder.Services.AddScoped<GeneratePinService>();
 builder.Services.AddScoped<GenerateTokenService>();
+builder.Services.AddScoped<ActionResultService>();
 
 //General
 builder.Services.AddControllers(options =>

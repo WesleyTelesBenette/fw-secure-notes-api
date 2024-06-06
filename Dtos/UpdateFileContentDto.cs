@@ -1,6 +1,9 @@
-﻿namespace fw_secure_notes_api.Dtos;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace fw_secure_notes_api.Dtos;
 
 public class UpdateFileContentDto
 {
-    public Dictionary<int, string> Content { get; set; }
+    [Required]
+    public Dictionary<int, string?> Content { get; set; }
 }

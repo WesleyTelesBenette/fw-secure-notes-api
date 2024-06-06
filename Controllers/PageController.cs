@@ -15,46 +15,71 @@ public class PageController : Controller
 {
     private readonly PageRepository _page;
     private readonly GeneratePinService _gnPin;
+    private readonly ActionResultService _result;
 
-    public PageController(PageRepository page, GeneratePinService gnPin)
+    public PageController(PageRepository page, GeneratePinService gnPin, ActionResultService result)
     {
         _page = page;
         _gnPin = gnPin;
+        _result = result;
     }
 
     [HttpGet("themes")]
     [NoParameters]
     public IActionResult GetThemeList()
     {
-        var values = Enum.GetValues(typeof(ThemePage)).Cast<ThemePage>().ToList();
-        var themeListLength = values.Count;
+        try
+        {
+            var values = Enum.GetValues(typeof(ThemePage)).Cast<ThemePage>().ToList();
+            var themeListLength = values.Count;
 
-        Dictionary<byte, string> themeList = [];
+            Dictionary<byte, string> themeList = [];
 
-        for (byte c = 0; c < themeListLength; c++)
-            themeList.Add(c, values[c].ToString());
-        
-        return Ok(new { themes = themeList });
+            for (byte c = 0; c < themeListLength; c++)
+                themeList.Add(c, values[c].ToString());
+
+            return _result.GetAction(ActionResultService.Results.Get, content: themeList);
+        }
+        catch (Exception e)
+        {
+            return _result.GetActionAuto(ActionResultService.Results.ServerError, content: e);
+        }
     }
 
     [HttpGet("theme")]
     [ServiceFilter(typeof(TokenValidateActionFilter))]
     public async Task<IActionResult> GetPageTheme([FromRoute] string title, [FromRoute] string pin)
     {
-        var theme = await _page.GetPageTheme(title, pin);
+        try
+        {
+            var theme = await _page.GetPageTheme(title, pin);
 
-        return Ok(theme);
+            return (theme != null)
+                ? _result.GetAction(ActionResultService.Results.Get, content: theme)
+                : _result.GetActionAuto(ActionResultService.Results.NotFound, "Page.Theme");
+        }
+        catch (Exception e)
+        {
+            return _result.GetActionAuto(ActionResultService.Results.ServerError, content: e);
+        }
     }
 
     [HttpGet("files")]
     [ServiceFilter(typeof(TokenValidateActionFilter))]
     public IActionResult GetFileList([FromRoute] string title, [FromRoute] string pin)
     {
-        ICollection<string> fileList = _page.GetFileList(title, pin);
-        
-        return (fileList != null)
-            ? Ok(new { Files = fileList })
-            : NoContent();
+        try
+        {
+            var fileList = _page.GetFileList(title, pin);
+
+            return (fileList != null)
+                ? _result.GetAction(ActionResultService.Results.Get, content: fileList)
+                : _result.GetActionAuto(ActionResultService.Results.NoContent, "Page.Files");
+        }
+        catch (Exception e)
+        {
+            return _result.GetActionAuto(ActionResultService.Results.ServerError, content: e);
+        }
     }
 
     [HttpPost]
@@ -62,20 +87,26 @@ public class PageController : Controller
     [AllowAnonymous]
     public async Task<IActionResult> CreatePage([FromBody] CreatePageDto newPage)
     {
-        PageModel page = new
-        (
-            newPage.Title,
-            await _gnPin.Generate(newPage.Title),
-            BCrypt.Net.BCrypt.HashPassword(newPage.Password)
-        );
-
-        if ((page.Pin != null) && (await _page.CreatePage(page)))
+        try
         {
-            page.Password = "***";
-            return Created("", page);
-        }
+            PageModel newPageModel = new()
+            {
+                Title = newPage.Title,
+                Pin = await _gnPin.Generate(newPage.Title),
+                Password = BCrypt.Net.BCrypt.HashPassword(newPage.Password)
+            };
 
-        return StatusCode(500, "Ocorreu um erro inesperado no servidor.");
+            if (string.IsNullOrEmpty(newPageModel.Pin))
+                throw new Exception("Falha ao gerar PIN.");
+
+            var page = await _page.CreatePage(newPageModel);
+
+            return _result.GetActionAuto(page, "Page");
+        }
+        catch (Exception e)
+        {
+            return _result.GetActionAuto(ActionResultService.Results.ServerError, content: e);
+        }
     }
 
     [HttpPut("theme")]
@@ -83,24 +114,33 @@ public class PageController : Controller
     public async Task<IActionResult> ChangePageTheme
         ([FromRoute] string title, [FromRoute] string pin, [FromBody] UpdatePageThemeDto newTheme)
     {
-        return (await _page.UpdateTheme(title, pin, newTheme.Theme))
-            ? Ok()
-            : StatusCode(500, "Ocorreu um erro inesperado no servidor.");
+        try
+        {
+            var result = await _page.UpdateTheme(title, pin, newTheme.Theme);
+
+            return _result.GetActionAuto(result, "Page.Theme");
+        }
+        catch (Exception e)
+        {
+            return _result.GetActionAuto(ActionResultService.Results.ServerError, content: e);
+        }
     }
 
     [HttpPut("password")]
     [ServiceFilter(typeof(TokenValidateActionFilter))]
     public async Task<IActionResult> ChangePagePassword
-        ([FromRoute] string title, [FromRoute] string pin, [FromBody] UpdatePagePasswordDto newPassword)
+        ([FromRoute] string title, [FromRoute] string pin, [FromBody] UpdatePagePasswordDto updatePassword)
     {
-        if (await _page.IsPageValid(title, pin, newPassword.OldPassword))
+        try
         {
-            return (await _page.UpdatePassword(title, pin, newPassword.NewPassword))
-                ? Ok()
-                : StatusCode(500, "Ocorreu um erro inesperado no servidor.");
-        }
+            var result = await _page.UpdatePassword(title, pin, updatePassword.OldPassword, updatePassword.NewPassword);
 
-        return Unauthorized();
+            return _result.GetActionAuto(result, "Page.Password");
+        }
+        catch (Exception e)
+        {
+            return _result.GetActionAuto(ActionResultService.Results.ServerError, content: e);
+        }
     }
 
     [HttpDelete]
@@ -108,13 +148,15 @@ public class PageController : Controller
     public async Task<IActionResult> DeletePage
         ([FromRoute] string title, [FromRoute] string pin, [FromBody] DeletePageDto newDelete)
     {
-        if (await _page.IsPageValid(title, pin, newDelete.Password))
+        try
         {
-            return (await _page.DeletePage(title, pin))
-                ? Ok()
-                : StatusCode(500);
-        }
+            var result = await _page.DeletePage(title, pin, newDelete.Password);
 
-        return Unauthorized();
+            return _result.GetActionAuto(result, "Page");
+        }
+        catch (Exception e)
+        {
+            return _result.GetActionAuto(ActionResultService.Results.ServerError, content: e);
+        }
     }
 }
