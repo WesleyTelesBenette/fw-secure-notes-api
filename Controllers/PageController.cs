@@ -66,7 +66,7 @@ public class PageController : Controller
 
     [HttpGet("files")]
     [ServiceFilter(typeof(TokenValidateActionFilter))]
-    public IActionResult GetFileList([FromRoute] string title, [FromRoute] string pin)
+    public IActionResult GetPageFileList([FromRoute] string title, [FromRoute] string pin)
     {
         try
         {

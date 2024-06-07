@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using fw_secure_notes_api.Dtos;
+using Microsoft.AspNetCore.Mvc;
 
 namespace fw_secure_notes_api.Services;
 
@@ -72,18 +73,8 @@ public class ActionResultService
         };
     }
 
-    private static object ResponseObject(string? message = null, int code = 200, object? content = null)
+    private static ResultDto ResponseObject(string? message = null, int code = 200, object? content = null)
     {
-        if (message != null)
-        {
-            if (content != null)
-            {
-                return new { Message = message, StatusCode = code, Content = content };
-            }
-
-            return new { Message = message, StatusCode = code };
-        }
-
-        return new { StatusCode = code, Content = content };
+        return new() { Message = message, StatusCode = code, Content = content };
     }
 }

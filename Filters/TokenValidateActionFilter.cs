@@ -1,4 +1,5 @@
 ﻿using fw_secure_notes_api.Data;
+using fw_secure_notes_api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Security.Claims;
@@ -8,10 +9,12 @@ namespace fw_secure_notes_api.Filters;
 public class TokenValidateActionFilter : IAsyncActionFilter
 {
     private readonly PageRepository _page;
+    private readonly ActionResultService _result;
 
-    public TokenValidateActionFilter(PageRepository page)
+    public TokenValidateActionFilter(PageRepository page, ActionResultService result)
     {
         _page = page;
+        _result = result;
     }
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -27,14 +30,15 @@ public class TokenValidateActionFilter : IAsyncActionFilter
 
         if (!await IsPageExist(routeTitle, routePin))
         {
-            context.Result = new NotFoundResult();
+           
+            context.Result = _result.GetActionAuto(ActionResultService.Results.NotFound);
             return;
         }
 
         if ((!await IsPublicPage(routeTitle!, routePin!))
             && (!IsAuthorizedPage(user, routeTitle!, routePin!, tokenTitle!, tokenPin!)))
         {
-            context.Result = new UnauthorizedResult();
+            context.Result = _result.GetActionAuto(ActionResultService.Results.Unauthorized);
             return;
         }
 

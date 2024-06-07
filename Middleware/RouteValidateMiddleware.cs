@@ -1,5 +1,8 @@
 ﻿using fw_secure_notes_api.Attributes;
+using fw_secure_notes_api.Dtos;
+using fw_secure_notes_api.Services;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using System.Net.NetworkInformation;
 using System.Text.RegularExpressions;
 
 namespace fw_secure_notes_api.Middleware;
@@ -7,10 +10,12 @@ namespace fw_secure_notes_api.Middleware;
 public class RouteValidateMiddleware
 {
     private readonly RequestDelegate _next;
+    private ActionResultService _result;
 
-    public RouteValidateMiddleware(RequestDelegate next)
+    public RouteValidateMiddleware(RequestDelegate next, ActionResultService result)
     {
         _next = next;
+        _result = result;
     }
 
     public async Task Invoke(HttpContext context)
@@ -28,8 +33,10 @@ public class RouteValidateMiddleware
 
             if ((!isTitleValid) || (!isPinValid))
             {
-                context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                await context.Response.WriteAsync("Bad Request");
+                ResultDto result = (ResultDto) _result.GetActionAuto(ActionResultService.Results.Bad);
+
+                context.Response.StatusCode = result.StatusCode;
+                await context.Response.WriteAsJsonAsync(result);
                 context.Abort();
                 return;
             }
