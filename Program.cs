@@ -1,7 +1,6 @@
 using fw_secure_notes_api.Conventions;
 using fw_secure_notes_api.Data;
 using fw_secure_notes_api.Filters;
-using fw_secure_notes_api.Middleware;
 using fw_secure_notes_api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +37,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 //Filter
 builder.Services.AddScoped<TokenValidateActionFilter>();
+builder.Services.AddScoped<ParmatersValidateActionFilter>();
+
+
 
 //My Class
 builder.Services.AddScoped<GeneratePinService>();
@@ -83,7 +85,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -97,8 +98,6 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseMiddleware<RouteValidateMiddleware>();
 
 app.MapControllers();
 

@@ -1,5 +1,6 @@
 ﻿using fw_secure_notes_api.Data;
 using fw_secure_notes_api.Dtos;
+using fw_secure_notes_api.Filters;
 using fw_secure_notes_api.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,6 +23,7 @@ public class AuthenticationController : Controller
     }
 
     [HttpGet]
+    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
     public async Task<IActionResult> GetPageHasPassword([FromRoute] string title, [FromRoute] string pin)
     {
         try
@@ -37,6 +39,7 @@ public class AuthenticationController : Controller
     }
 
     [HttpPost]
+    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
     public async Task<IActionResult> CreateToken
         ([FromRoute] string title,
         [FromRoute] string pin,

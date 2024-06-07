@@ -26,6 +26,7 @@ public class PageController : Controller
 
     [HttpGet("themes")]
     [NoParameters]
+    [AllowAnonymous]
     public IActionResult GetThemeList()
     {
         try
@@ -47,6 +48,7 @@ public class PageController : Controller
     }
 
     [HttpGet("theme")]
+    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
     [ServiceFilter(typeof(TokenValidateActionFilter))]
     public async Task<IActionResult> GetPageTheme([FromRoute] string title, [FromRoute] string pin)
     {
@@ -65,6 +67,7 @@ public class PageController : Controller
     }
 
     [HttpGet("files")]
+    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
     [ServiceFilter(typeof(TokenValidateActionFilter))]
     public IActionResult GetPageFileList([FromRoute] string title, [FromRoute] string pin)
     {
@@ -110,6 +113,7 @@ public class PageController : Controller
     }
 
     [HttpPut("theme")]
+    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
     [ServiceFilter(typeof(TokenValidateActionFilter))]
     public async Task<IActionResult> ChangePageTheme
         ([FromRoute] string title, [FromRoute] string pin, [FromBody] UpdatePageThemeDto newTheme)
@@ -127,6 +131,7 @@ public class PageController : Controller
     }
 
     [HttpPut("password")]
+    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
     [ServiceFilter(typeof(TokenValidateActionFilter))]
     public async Task<IActionResult> ChangePagePassword
         ([FromRoute] string title, [FromRoute] string pin, [FromBody] UpdatePagePasswordDto updatePassword)
@@ -144,13 +149,14 @@ public class PageController : Controller
     }
 
     [HttpDelete]
+    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
     [ServiceFilter(typeof(TokenValidateActionFilter))]
     public async Task<IActionResult> DeletePage
-        ([FromRoute] string title, [FromRoute] string pin, [FromBody] DeletePageDto newDelete)
+        ([FromRoute] string title, [FromRoute] string pin)
     {
         try
         {
-            var result = await _page.DeletePage(title, pin, newDelete.Password);
+            var result = await _page.DeletePage(title, pin);
 
             return _result.GetActionAuto(result, "Page");
         }

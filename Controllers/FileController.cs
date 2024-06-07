@@ -2,6 +2,7 @@
 using fw_secure_notes_api.Dtos;
 using fw_secure_notes_api.Filters;
 using fw_secure_notes_api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace fw_secure_notes_api.Controllers;
@@ -20,6 +21,7 @@ public class FileController : Controller
     }
 
     [HttpGet("{fileIndex}")]
+    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
     [ServiceFilter(typeof(TokenValidateActionFilter))]
     public async Task<IActionResult> GetFile([FromRoute] string title, [FromRoute] string pin, [FromRoute] int fileIndex)
     {
@@ -38,6 +40,7 @@ public class FileController : Controller
     }
 
     [HttpPost]
+    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
     [ServiceFilter(typeof(TokenValidateActionFilter))]
     public async Task<IActionResult> CreateFile([FromRoute] string title, [FromRoute] string pin, [FromBody] CreateFileDto newFile)
     {
@@ -54,6 +57,7 @@ public class FileController : Controller
     }
 
     [HttpPut("{fileIndex}/title")]
+    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
     public async Task<IActionResult> UpdateFileTitle
         ([FromRoute] string title, [FromRoute] string pin, [FromRoute] int fileIndex, [FromBody] UpdateFileTitleDto newTitle)
     {
@@ -70,6 +74,7 @@ public class FileController : Controller
     }
 
     [HttpPut("{fileIndex}/content")]
+    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
     public async Task<IActionResult> UpdateFileContent
         ([FromRoute] string title, [FromRoute] string pin, int fileIndex, [FromBody] UpdateFileContentDto updateContent)
     {
@@ -86,6 +91,7 @@ public class FileController : Controller
     }
 
     [HttpDelete("{fileIndex}")]
+    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
     [ServiceFilter(typeof(TokenValidateActionFilter))]
     public async Task<IActionResult> DeleteFile([FromRoute] string title, [FromRoute] string pin, [FromRoute] ushort fileIndex)
     {

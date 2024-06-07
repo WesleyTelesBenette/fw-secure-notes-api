@@ -133,27 +133,20 @@ public class PageRepository
 
 
     //Deletes
-    public async Task<ActionResultService.Results> DeletePage(string title, string pin, string password)
+    public async Task<ActionResultService.Results> DeletePage(string title, string pin)
     {
-        var pageValid = await IsPageValid(title, pin, password);
+        var page = await _dbContext.Pages
+            .FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
 
-        if (pageValid)
+        if (page != null)
         {
-            var page = await _dbContext.Pages
-                .FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
+            _dbContext.Remove(page);
+            var save = await _dbContext.SaveChangesAsync();
 
-            if (page != null)
-            {
-                _dbContext.Remove(page);
-                var save = await _dbContext.SaveChangesAsync();
-
-                return (save > 0)
-                    ? ActionResultService.Results.Delete
-                    : ActionResultService.Results.ServerError;
-            }
-            return ActionResultService.Results.NotFound;
+            return (save > 0)
+                ? ActionResultService.Results.Delete
+                : ActionResultService.Results.ServerError;
         }
-
-        return ActionResultService.Results.Unauthorized;
+        return ActionResultService.Results.NotFound;
     }
 }
