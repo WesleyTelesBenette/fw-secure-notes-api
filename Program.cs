@@ -10,6 +10,19 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyHeader()
+                   .AllowAnyMethod()
+                   .AllowCredentials();
+        });
+});
+
 //Database
 var connectionString = builder.Configuration.GetConnectionString("DefaultDatabase");
 builder.Services.AddDbContext<DatabaseContext>(options => options.UseNpgsql(connectionString));
@@ -86,6 +99,8 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+app.UseCors("AllowAll");
 
 if (app.Environment.IsDevelopment())
 {
