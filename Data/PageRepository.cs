@@ -62,9 +62,9 @@ public class PageRepository
         return fileList;
     }
 
-    public async Task<ICollection<PageModel>> GetPageListWithThisTitle(string title)
+    public async Task<List<string>> GetPageListWithThisTitle(string title)
     {
-        return (await _dbContext.Pages.Where(p => p.Title == title).ToListAsync()) ?? [];
+        return (await _dbContext.Pages.Where(p => p.Title == title).Select(p => p.Pin).ToListAsync()) ?? [];
     }
 
 

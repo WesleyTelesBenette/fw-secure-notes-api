@@ -15,7 +15,7 @@ public class PageModel
 
     [Required]
     [MaxLength(3)]
-    [RegularExpression(@"^[a-zA-Z0-9\-]*$")]
+    [RegularExpression(@"^[a-zA-Z0-9\-]+$")]
     public string Pin { get; set; }
 
     public string Password { get; set; } = "";

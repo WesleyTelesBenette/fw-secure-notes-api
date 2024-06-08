@@ -19,8 +19,12 @@ public class ParmatersValidateActionFilter : IAsyncActionFilter
         var routeTitle = routeVars.GetValueOrDefault("title")?.ToString();
         var routePin = routeVars.GetValueOrDefault("pin")?.ToString();
 
-        bool isTitleValid = (routeTitle != null) && (routeTitle.ToString()!.Length <= 25);
-        bool isPinValid = (routePin != null) && (Regex.IsMatch(routePin.ToString()!, @"^[a-zA-Z0-9\-]*$"));
+        bool isTitleValid = (routeTitle != null)
+            && (routeTitle.ToString()!.Length <= 25);
+
+        bool isPinValid = (routePin != null)
+            && (Regex.IsMatch(routePin.ToString()!, @"^[a-zA-Z0-9\-]+$")
+            && (routePin.ToString()!.Length == 3));
 
         if ((!isTitleValid) || (!isPinValid))
         {

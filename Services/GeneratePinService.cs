@@ -1,4 +1,5 @@
 ﻿using fw_secure_notes_api.Data;
+using System.Text.RegularExpressions;
 
 namespace fw_secure_notes_api.Services;
 
@@ -17,19 +18,19 @@ public class GeneratePinService
     {
         try
         {
+            var random = new Random();
             string pin   = "";
-            var pages    = await _page.GetPageListWithThisTitle(title);
-            var pagePins = pages.Select(p => p.Pin).ToList();
-            int quant    = pages.Count;
+            var pagePins = await _page.GetPageListWithThisTitle(title);
+            int quant    = pagePins.Count;
 
             for (int a = 0; true; a++)
             {
                 pin = "";
 
                 for (int c = 1; c <= 3; c++)
-                    pin = string.Concat(pin, caracters[(((quant+c+a)*c))%caracters.Length]);
+                    pin += caracters[random.Next(caracters.Length)];
                 
-                if (!pagePins.Contains(pin))
+                if ((Regex.IsMatch(pin, @"^[a-zA-Z0-9\-]+$")) && (!pagePins.Contains(pin)))
                     break;
             }
             
