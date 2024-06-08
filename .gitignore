@@ -363,3 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 /Services/GeneratePin.cs
 /Services/GeneratePin.cs
+
+# Arquivos de desenvolvimento
+/Controllers/DevController.cs
