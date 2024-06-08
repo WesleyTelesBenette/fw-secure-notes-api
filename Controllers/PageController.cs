@@ -24,6 +24,25 @@ public class PageController : Controller
         _result = result;
     }
 
+    [HttpGet("exist")]
+    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetPageExist([FromRoute] string title, [FromRoute] string pin)
+    {
+        try
+        {
+            var isExist = await _page.IsPageExist(title, pin);
+
+            return (isExist)
+                ? _result.GetActionAuto(ActionResultService.Results.Get)
+                : _result.GetActionAuto(ActionResultService.Results.NotFound);
+        }
+        catch (Exception e)
+        {
+            return _result.GetActionAuto(ActionResultService.Results.ServerError, content: e);
+        }
+    }
+
     [HttpGet("themes")]
     [NoParameters]
     [AllowAnonymous]
