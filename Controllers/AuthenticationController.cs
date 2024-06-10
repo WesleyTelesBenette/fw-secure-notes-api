@@ -30,7 +30,7 @@ public class AuthenticationController : Controller
         {
             var result = await _auth.GetPageConfig(title, pin);
 
-            return _result.GetActionAuto(result, "Page");
+            return _result.GetActionAuto(result, "Page", true);
         }
         catch (Exception e)
         {
