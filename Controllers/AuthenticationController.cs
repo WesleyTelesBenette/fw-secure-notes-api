@@ -22,20 +22,28 @@ public class AuthenticationController : Controller
         _result = result;
     }
 
-    [HttpGet]
+    [HttpGet("password")]
     [ServiceFilter(typeof(ParmatersValidateActionFilter))]
     public async Task<IActionResult> GetPageHasPassword([FromRoute] string title, [FromRoute] string pin)
     {
         try
         {
-            var isPassword = await _auth.GetPageHasPassword(title, pin);
+            var result = await _auth.GetPageConfig(title, pin);
 
-            return _result.GetAction(ActionResultService.Results.Get, content: isPassword);
+            return _result.GetActionAuto(result, "Page");
         }
         catch (Exception e)
         {
             return _result.GetActionAuto(ActionResultService.Results.ServerError, content: e);
         }
+    }
+
+    [HttpGet("validate")]
+    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
+    [ServiceFilter(typeof(TokenValidateActionFilter))]
+    public IActionResult CheckValidToken([FromRoute] string title, [FromRoute] string pin)
+    {
+        return _result.GetAction(ActionResultService.Results.Get);
     }
 
     [HttpPost]
@@ -50,7 +58,7 @@ public class AuthenticationController : Controller
             var result = await _auth.IsPageValide(title, pin, login.Password);
             string token = _gnrtToken.GenerateToken(title, pin);
 
-            return _result.GetAction(result, content: $"Bearer {token}"); ;
+            return _result.GetAction(result, content: $"Bearer {token}");
         }
         catch (Exception e)
         {

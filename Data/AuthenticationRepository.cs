@@ -1,6 +1,5 @@
 ﻿using fw_secure_notes_api.Services;
 using Microsoft.EntityFrameworkCore;
-using System.Net.NetworkInformation;
 
 namespace fw_secure_notes_api.Data;
 
@@ -14,12 +13,19 @@ public class AuthenticationRepository
     }
 
     //Gets
-    public async Task<bool> GetPageHasPassword(string title, string pin)
+    public async Task<ActionResultService.Results> GetPageConfig(string title, string pin)
     {
         var page = await _dbContext.Pages
             .FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
 
-        return page?.Password != null;
+        if (page != null)
+        {
+            return (!string.IsNullOrEmpty(page.Password))
+                ? ActionResultService.Results.Get
+                : ActionResultService.Results.NoContent;
+        }
+
+        return ActionResultService.Results.NotFound;
     }
 
 

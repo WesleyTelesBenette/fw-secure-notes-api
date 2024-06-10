@@ -1,6 +1,5 @@
 ﻿using fw_secure_notes_api.Data;
 using fw_secure_notes_api.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Security.Claims;
 
@@ -30,7 +29,6 @@ public class TokenValidateActionFilter : IAsyncActionFilter
 
         if (!await IsPageExist(routeTitle, routePin))
         {
-           
             context.Result = _result.GetActionAuto(ActionResultService.Results.NotFound);
             return;
         }
