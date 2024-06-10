@@ -43,7 +43,7 @@ public class AuthenticationController : Controller
     [ServiceFilter(typeof(TokenValidateActionFilter))]
     public IActionResult CheckValidToken([FromRoute] string title, [FromRoute] string pin)
     {
-        return _result.GetAction(ActionResultService.Results.Get);
+        return _result.GetActionAuto(ActionResultService.Results.Get);
     }
 
     [HttpPost]
