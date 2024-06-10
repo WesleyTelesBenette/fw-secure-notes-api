@@ -11,7 +11,7 @@ public class DevController(DatabaseContext db) : ControllerBase
 {
     private DatabaseContext _db = db;
 
-    [HttpGet("all/pages")]
+    [HttpGet("pages")]
     [NoParameters]
     public async Task<IActionResult> GetAllPages()
     {
@@ -19,7 +19,7 @@ public class DevController(DatabaseContext db) : ControllerBase
         return Ok(pages);
     }
 
-    [HttpGet("all/files")]
+    [HttpGet("files")]
     [NoParameters]
     public async Task<IActionResult> GetAllFiles()
     {
