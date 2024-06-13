@@ -53,11 +53,11 @@ public class PageRepository
             : new() { ThemeName = theme!.Theme.ToString(), ThemeIndex = theme!.Theme };
     }
 
-    public ICollection<string>? GetFileList(string title, string pin)
+    public ICollection<FileModelDto>? GetFileList(string title, string pin)
     {
-        ICollection<string>? fileList = _dbContext.Files
+        ICollection<FileModelDto>? fileList = _dbContext.Files
             .Where(f => (f.Page.Title == title) && (f.Page.Pin == pin))
-            .OrderBy(f => f.Title).Select(f => f.Title).ToList();
+            .OrderBy(f => f.Title).Select(f => new FileModelDto { Id = f.Id, Title = f.Title }).ToList();
 
         return fileList;
     }
