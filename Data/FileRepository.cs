@@ -72,13 +72,17 @@ public class FileRepository
 
         if (file != null)
         {
-            file.Title = newTitle;
-            var save = await _dbContext.SaveChangesAsync();
+            if (file.Title != newTitle)
+            {
+                file.Title = newTitle;
+                var save = await _dbContext.SaveChangesAsync();
 
-            return (save > 0)
-                ? ActionResultService.Results.Update
-                : ActionResultService.Results.ServerError;
+                return (save > 0)
+                    ? ActionResultService.Results.Update
+                    : ActionResultService.Results.ServerError;
+            }
 
+            return ActionResultService.Results.Update;
         }
 
         return ActionResultService.Results.NotFound;
