@@ -22,7 +22,7 @@ public class FileController : Controller
     [HttpGet("{fileId}")]
     [ServiceFilter(typeof(ParmatersValidateActionFilter))]
     [ServiceFilter(typeof(TokenValidateActionFilter))]
-    public async Task<IActionResult> GetFile([FromRoute] string title, [FromRoute] string pin, [FromRoute] int fileId)
+    public async Task<IActionResult> GetFile([FromRoute] string title, [FromRoute] string pin, [FromRoute] ushort  fileId)
     {
         try
         {
@@ -60,7 +60,7 @@ public class FileController : Controller
     [HttpPut("{fileId}/title")]
     [ServiceFilter(typeof(ParmatersValidateActionFilter))]
     public async Task<IActionResult> UpdateFileTitle
-        ([FromRoute] string title, [FromRoute] string pin, [FromRoute] int fileId, [FromBody] UpdateFileTitleDto newTitle)
+        ([FromRoute] string title, [FromRoute] string pin, [FromRoute] ushort fileId, [FromBody] UpdateFileTitleDto newTitle)
     {
         try
         {
@@ -74,14 +74,48 @@ public class FileController : Controller
         }
     }
 
-    [HttpPut("{fileId}/content")]
+    [HttpPut("{fileId}/add/content")]
     [ServiceFilter(typeof(ParmatersValidateActionFilter))]
-    public async Task<IActionResult> UpdateFileContent
-        ([FromRoute] string title, [FromRoute] string pin, int fileId, [FromBody] UpdateFileContentDto updateContent)
+    public async Task<IActionResult> UpdateFileAddLine
+        ([FromRoute] string title, [FromRoute] string pin, ushort fileId, [FromBody] UpdateFileContentDto updateContent)
     {
         try
         {
-            var result = await _file.UpdateFileContent(title, pin, fileId, updateContent.Content);
+            var result = await _file.UpdateFileAddLine(title, pin, fileId, updateContent);
+
+            return _result.GetActionAuto(result, $"File[{fileId}].Content");
+        }
+        catch (Exception e)
+        {
+            return _result.GetActionAuto(ActionResultService.Results.ServerError, content: e);
+        }
+    }
+
+    [HttpPut("{fileId}/update/content")]
+    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
+    public async Task<IActionResult> UpdateFileUpdateContent
+        ([FromRoute] string title, [FromRoute] string pin, ushort fileId, [FromBody] UpdateFileContentDto updateContent)
+    {
+        try
+        {
+            var result = await _file.UpdateFileUpdateContent(title, pin, fileId, updateContent);
+
+            return _result.GetActionAuto(result, $"File[{fileId}].Content");
+        }
+        catch (Exception e)
+        {
+            return _result.GetActionAuto(ActionResultService.Results.ServerError, content: e);
+        }
+    }
+
+    [HttpPut("{fileId}/remove/content")]
+    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
+    public async Task<IActionResult> UpdateFileRemoveLine
+        ([FromRoute] string title, [FromRoute] string pin, ushort fileId, [FromBody] UpdateFileContentDto updateContent)
+    {
+        try
+        {
+            var result = await _file.UpdateFileRemoveLine(title, pin, fileId, updateContent);
 
             return _result.GetActionAuto(result, $"File[{fileId}].Content");
         }
