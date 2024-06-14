@@ -1,4 +1,4 @@
-﻿namespace fw_secure_notes_api.Dtos;
+﻿namespace fw_secure_notes_api.Dtos.General;
 
 public class LoginDto
 {

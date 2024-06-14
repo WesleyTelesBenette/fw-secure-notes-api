@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace fw_secure_notes_api.Dtos;
+namespace fw_secure_notes_api.Dtos.File;
 
 public class CreateFileDto
 {

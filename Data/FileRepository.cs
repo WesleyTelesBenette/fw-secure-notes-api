@@ -1,4 +1,4 @@
-﻿using fw_secure_notes_api.Dtos;
+﻿using fw_secure_notes_api.Dtos.File;
 using fw_secure_notes_api.Models;
 using fw_secure_notes_api.Services;
 using Microsoft.EntityFrameworkCore;
@@ -120,7 +120,7 @@ public class FileRepository
                     continue;
                 }
 
-                file!.Content[newLineContent.Key - indexDeleteCount] = newLineContent.Value;
+                file.Content[newLineContent.Key - indexDeleteCount] = newLineContent.Value;
             }
 
             var save = await _dbContext.SaveChangesAsync();

@@ -1,4 +1,4 @@
-﻿using fw_secure_notes_api.Dtos;
+﻿using fw_secure_notes_api.Dtos.General;
 using Microsoft.AspNetCore.Mvc;
 
 namespace fw_secure_notes_api.Services;

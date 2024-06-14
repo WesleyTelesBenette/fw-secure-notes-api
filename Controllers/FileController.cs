@@ -1,5 +1,5 @@
 ﻿using fw_secure_notes_api.Data;
-using fw_secure_notes_api.Dtos;
+using fw_secure_notes_api.Dtos.File;
 using fw_secure_notes_api.Filters;
 using fw_secure_notes_api.Services;
 using Microsoft.AspNetCore.Mvc;
