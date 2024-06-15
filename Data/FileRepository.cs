@@ -107,16 +107,14 @@ public class FileRepository
 
                 newFileContent.AddRange(contentFile.Take(update.Index));
                 newFileContent.Add(update.Content ?? "");
-                newFileContent.AddRange(contentFile.TakeLast(contentFile.Count - (update.Index+1)));
+                newFileContent.AddRange(contentFile.TakeLast(contentFile.Count - (update.Index)));
 
-                file.Content = contentFile;
+                file.Content = newFileContent;
             }
 
             var save = await _dbContext.SaveChangesAsync();
 
-            return (save > 0)
-                ? ActionResultService.Results.Update
-                : ActionResultService.Results.ServerError;
+            return ActionResultService.Results.Update;
         }
 
         return ActionResultService.Results.NotFound;
