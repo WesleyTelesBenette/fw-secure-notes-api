@@ -118,7 +118,7 @@ public class FileRepository
         }
 
         return ActionResultService.Results.NotFound;
-    }
+    }   
 
     public async Task<ActionResultService.Results> UpdateFileUpdateContent(string title, string pin, ushort fileId, UpdateFileContentDto update)
     {
@@ -127,7 +127,11 @@ public class FileRepository
 
         if (file != null)
         {
-            file.Content[update.Index] = update.Content ?? "";
+            if (file.Content.Count < update.Index)
+            {
+                file.Content[update.Index] = update.Content ?? "";
+            }
+            else file.Content.Add(update.Content ?? "");
 
             var save = await _dbContext.SaveChangesAsync();
 
