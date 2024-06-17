@@ -127,7 +127,7 @@ public class FileRepository
 
         if (file != null)
         {
-            if (file.Content.Count < update.Index)
+            if (file.Content.Count >= update.Index)
             {
                 file.Content[update.Index] = update.Content ?? "";
             }
