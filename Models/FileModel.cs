@@ -13,7 +13,7 @@ public class FileModel
     public string Title { get; set; } = string.Empty;
 
     [Required]
-    public List<string> Content { get; set; } = new();
+    public List<string> Content { get; set; } = [""];
 
     [Required]
     public uint PageId { get; set; }
