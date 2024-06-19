@@ -123,7 +123,7 @@ public class PageController : Controller
 
             var page = await _page.CreatePage(newPageModel);
 
-            return _result.GetActionAuto(page, "Page", new { Title = newPage.Title, Pin = newPageModel.Pin });
+            return _result.GetActionAuto(page, "Page", new { newPage.Title, newPageModel.Pin });
         }
         catch (Exception e)
         {

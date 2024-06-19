@@ -8,6 +8,8 @@ namespace fw_secure_notes_api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[ServiceFilter(typeof(ParmatersValidateActionFilter))]
+[ServiceFilter(typeof(TokenValidateActionFilter))]
 public class FileController : Controller
 {
     private readonly FileRepository _file;
@@ -20,8 +22,6 @@ public class FileController : Controller
     }
 
     [HttpGet("{fileId}")]
-    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
-    [ServiceFilter(typeof(TokenValidateActionFilter))]
     public async Task<IActionResult> GetFile([FromRoute] string title, [FromRoute] string pin, [FromRoute] ushort  fileId)
     {
         try
@@ -39,8 +39,6 @@ public class FileController : Controller
     }
 
     [HttpPost]
-    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
-    [ServiceFilter(typeof(TokenValidateActionFilter))]
     public async Task<IActionResult> CreateFile([FromRoute] string title, [FromRoute] string pin, [FromBody] CreateFileDto newFile)
     {
         try
@@ -58,7 +56,6 @@ public class FileController : Controller
     }
 
     [HttpPut("{fileId}/title")]
-    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
     public async Task<IActionResult> UpdateFileTitle
         ([FromRoute] string title, [FromRoute] string pin, [FromRoute] ushort fileId, [FromBody] UpdateFileTitleDto newTitle)
     {
@@ -75,7 +72,6 @@ public class FileController : Controller
     }
 
     [HttpPut("{fileId}/add/content")]
-    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
     public async Task<IActionResult> UpdateFileAddLine
         ([FromRoute] string title, [FromRoute] string pin, ushort fileId, [FromBody] UpdateFileContentDto updateContent)
     {
@@ -92,7 +88,6 @@ public class FileController : Controller
     }
 
     [HttpPut("{fileId}/update/content")]
-    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
     public async Task<IActionResult> UpdateFileUpdateContent
         ([FromRoute] string title, [FromRoute] string pin, ushort fileId, [FromBody] UpdateFileContentDto updateContent)
     {
@@ -109,7 +104,6 @@ public class FileController : Controller
     }
 
     [HttpPut("{fileId}/remove/content")]
-    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
     public async Task<IActionResult> UpdateFileRemoveLine
         ([FromRoute] string title, [FromRoute] string pin, ushort fileId, [FromBody] UpdateFileContentDto updateContent)
     {
@@ -126,8 +120,6 @@ public class FileController : Controller
     }
 
     [HttpDelete("{fileId}")]
-    [ServiceFilter(typeof(ParmatersValidateActionFilter))]
-    [ServiceFilter(typeof(TokenValidateActionFilter))]
     public async Task<IActionResult> DeleteFile([FromRoute] string title, [FromRoute] string pin, [FromRoute] ushort fileId)
     {
         try

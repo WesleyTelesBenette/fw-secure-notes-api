@@ -72,7 +72,9 @@ public class PageRepository
     ///Posts
     public async Task<ActionResultService.Results> CreatePage(PageModel newPage)
     {
+        newPage.Files.Add(new());
         await _dbContext.Pages.AddAsync(newPage);
+
         int save = await _dbContext.SaveChangesAsync();
 
         return (save > 0)
