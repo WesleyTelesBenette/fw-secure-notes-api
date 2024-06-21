@@ -20,21 +20,9 @@ public class PageModel
 
     public string Password { get; set; } = "";
 
-    public ThemePage Theme { get; set; } = ThemePage.Dark;
+    public int Theme { get; set; } = 0;
 
     public ICollection<FileModel> Files { get; set; } = [];
 
     public PageModel() { }
-}
-
-public enum ThemePage
-{
-    Dark,
-    Light,
-    Red,
-    Gold,
-    Blue,
-    Green,
-    Purple,
-    Orange
 }

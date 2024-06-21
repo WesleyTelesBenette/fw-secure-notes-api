@@ -43,29 +43,6 @@ public class PageController : Controller
         }
     }
 
-    [HttpGet("themes")]
-    [NoParameters]
-    [AllowAnonymous]
-    public IActionResult GetThemeList()
-    {
-        try
-        {
-            var values = Enum.GetValues(typeof(ThemePage)).Cast<ThemePage>().ToList();
-            var themeListLength = values.Count;
-
-            Dictionary<byte, string> themeList = [];
-
-            for (byte c = 0; c < themeListLength; c++)
-                themeList.Add(c, values[c].ToString());
-
-            return _result.GetAction(ActionResultService.Results.Get, content: themeList);
-        }
-        catch (Exception e)
-        {
-            return _result.GetActionAuto(ActionResultService.Results.ServerError, content: e);
-        }
-    }
-
     [HttpGet("theme")]
     [ServiceFilter(typeof(ParmatersValidateActionFilter))]
     [ServiceFilter(typeof(TokenValidateActionFilter))]
@@ -77,7 +54,7 @@ public class PageController : Controller
 
             return (theme != null)
                 ? _result.GetAction(ActionResultService.Results.Get, content: theme)
-                : _result.GetActionAuto(ActionResultService.Results.NotFound, "Page.Theme");
+                : _result.GetAction(ActionResultService.Results.Get, content: 0);
         }
         catch (Exception e)
         {

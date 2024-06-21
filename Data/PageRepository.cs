@@ -1,5 +1,4 @@
-﻿using fw_secure_notes_api.Dtos;
-using fw_secure_notes_api.Dtos.File;
+﻿using fw_secure_notes_api.Dtos.File;
 using fw_secure_notes_api.Models;
 using fw_secure_notes_api.Services;
 using Microsoft.EntityFrameworkCore;
@@ -44,14 +43,12 @@ public class PageRepository
 
 
     //Gets
-    public async Task<PageThemeDto?> GetPageTheme(string title, string pin)
+    public async Task<int?> GetPageTheme(string title, string pin)
     {
         var theme = await _dbContext.Pages
             .FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
 
-        return (theme == null)
-            ? null
-            : new() { ThemeName = theme!.Theme.ToString(), ThemeIndex = theme!.Theme };
+        return theme?.Theme;
     }
 
     public ICollection<FileModelDto>? GetFileList(string title, string pin)
@@ -84,29 +81,22 @@ public class PageRepository
 
 
     //Puts
-    public async Task<ActionResultService.Results> UpdateTheme(string title, string pin, ThemePage newTheme)
+    public async Task<ActionResultService.Results> UpdateTheme(string title, string pin, int newTheme)
     {
-        var themeList = Enum.GetValues(typeof(ThemePage)).Cast<ThemePage>().ToList();
+        var page = await _dbContext.Pages
+            .FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
 
-        if (!themeList.Contains(newTheme))
+        if (page != null)
         {
-            var page = await _dbContext.Pages
-                .FirstOrDefaultAsync(p => (p.Title == title) && (p.Pin == pin));
+            page.Theme = newTheme;
+            var save = await _dbContext.SaveChangesAsync();
 
-            if (page != null)
-            {
-                page.Theme = newTheme;
-                var save = await _dbContext.SaveChangesAsync();
-
-                return (save > 0)
-                    ? ActionResultService.Results.Update
-                    : ActionResultService.Results.ServerError;
-            }
-
-            return ActionResultService.Results.NotFound;
+            return (save > 0)
+                ? ActionResultService.Results.Update
+                : ActionResultService.Results.ServerError;
         }
 
-        return ActionResultService.Results.Bad;
+        return ActionResultService.Results.NotFound;
     }
 
     public async Task<ActionResultService.Results> UpdatePassword(string title, string pin, string oldPassword, string newPassword)

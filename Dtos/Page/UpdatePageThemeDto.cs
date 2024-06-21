@@ -6,6 +6,6 @@ namespace fw_secure_notes_api.Dtos;
 public class UpdatePageThemeDto
 {
     [Required]
-    public ThemePage Theme { get; set; } = ThemePage.Dark;
+    public int Theme { get; set; } = 0;
 }
 
