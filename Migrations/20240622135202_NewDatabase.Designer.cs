@@ -12,8 +12,8 @@ using fw_secure_notes_api.Data;
 namespace fw_secure_notes_api.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20240620214017_UpdatePageModelThemeType")]
-    partial class UpdatePageModelThemeType
+    [Migration("20240622135202_NewDatabase")]
+    partial class NewDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

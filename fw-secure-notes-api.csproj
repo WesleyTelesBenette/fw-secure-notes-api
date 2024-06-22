@@ -12,36 +12,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Conventions\NovaPasta1\**" />
-    <Compile Remove="Conventions\NovaPasta\**" />
-    <Compile Remove="Filters\NovaPasta\**" />
-    <Compile Remove="Migrations\**" />
-    <Compile Remove="NovaPasta1\**" />
-    <Content Remove="Conventions\NovaPasta1\**" />
-    <Content Remove="Conventions\NovaPasta\**" />
-    <Content Remove="Filters\NovaPasta\**" />
-    <Content Remove="Migrations\**" />
-    <Content Remove="NovaPasta1\**" />
-    <EmbeddedResource Remove="Conventions\NovaPasta1\**" />
-    <EmbeddedResource Remove="Conventions\NovaPasta\**" />
-    <EmbeddedResource Remove="Filters\NovaPasta\**" />
-    <EmbeddedResource Remove="Migrations\**" />
-    <EmbeddedResource Remove="NovaPasta1\**" />
-    <None Remove="Conventions\NovaPasta1\**" />
-    <None Remove="Conventions\NovaPasta\**" />
-    <None Remove="Filters\NovaPasta\**" />
-    <None Remove="Migrations\**" />
-    <None Remove="NovaPasta1\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="20240603135613_InitialCreate.cs" />
-    <Compile Remove="20240603135613_InitialCreate.Designer.cs" />
-    <Compile Remove="DatabaseContextModelSnapshot.cs" />
-    <Compile Remove="Resources\Themes.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Docker.DotNet" Version="3.125.15" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.5" />
