@@ -9,5 +9,5 @@ public class FileModelDto
     [MaxLength(48)]
     public string Title { get; set; } = string.Empty;
 
-    public List<string> Content { get; set; } = [];
+    public string Content { get; set; } = "";
 }

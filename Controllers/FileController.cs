@@ -22,7 +22,7 @@ public class FileController : Controller
     }
 
     [HttpGet("{fileId}")]
-    public async Task<IActionResult> GetFile([FromRoute] string title, [FromRoute] string pin, [FromRoute] ushort  fileId)
+    public async Task<IActionResult> GetFile([FromRoute] string title, [FromRoute] string pin, [FromRoute] ushort fileId)
     {
         try
         {
@@ -71,45 +71,13 @@ public class FileController : Controller
         }
     }
 
-    [HttpPut("{fileId}/add/content")]
-    public async Task<IActionResult> UpdateFileAddLine
+    [HttpPut("{fileId}/content")]
+    public async Task<IActionResult> UpdateFileContent
         ([FromRoute] string title, [FromRoute] string pin, ushort fileId, [FromBody] UpdateFileContentDto updateContent)
     {
         try
         {
-            var result = await _file.UpdateFileAddLine(title, pin, fileId, updateContent);
-
-            return _result.GetActionAuto(result, $"File[{fileId}].Content");
-        }
-        catch (Exception e)
-        {
-            return _result.GetActionAuto(ActionResultService.Results.ServerError, content: e);
-        }
-    }
-
-    [HttpPut("{fileId}/update/content")]
-    public async Task<IActionResult> UpdateFileUpdateContent
-        ([FromRoute] string title, [FromRoute] string pin, ushort fileId, [FromBody] UpdateFileContentDto updateContent)
-    {
-        try
-        {
-            var result = await _file.UpdateFileUpdateContent(title, pin, fileId, updateContent);
-
-            return _result.GetActionAuto(result, $"File[{fileId}].Content");
-        }
-        catch (Exception e)
-        {
-            return _result.GetActionAuto(ActionResultService.Results.ServerError, content: e);
-        }
-    }
-
-    [HttpPut("{fileId}/remove/content")]
-    public async Task<IActionResult> UpdateFileRemoveLine
-        ([FromRoute] string title, [FromRoute] string pin, ushort fileId, [FromBody] UpdateFileContentDto updateContent)
-    {
-        try
-        {
-            var result = await _file.UpdateFileRemoveLine(title, pin, fileId, updateContent);
+            var result = await _file.UpdateFileContent(title, pin, fileId, updateContent);
 
             return _result.GetActionAuto(result, $"File[{fileId}].Content");
         }

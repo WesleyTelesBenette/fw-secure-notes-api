@@ -24,6 +24,6 @@ public class DatabaseContext : DbContext
 
         modelBuilder.Entity<FileModel>()
             .Property(f => f.Content)
-            .HasColumnType("text[]");
+            .HasColumnType("text");
     }
 }

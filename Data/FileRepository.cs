@@ -88,94 +88,23 @@ public class FileRepository
         return ActionResultService.Results.NotFound;
     }
 
-    public async Task<ActionResultService.Results> UpdateFileAddLine(string title, string pin, ushort fileId, UpdateFileContentDto update)
+    public async Task<ActionResultService.Results> UpdateFileContent(string title, string pin, ushort fileId, UpdateFileContentDto update)
     {
         var file = await _dbContext.Files
              .FirstOrDefaultAsync(f => (f.Id == fileId) && (f.Page.Title == title) && (f.Page.Pin == pin));
 
         if (file != null)
         {
-            if (file.Content.Count == update.Index)
-            {
-                file.Content.Add(update.Content ?? "");
-            }
-            else
-            {
-                List<string> newFileContent = [];
-                var contentFile = file.Content;
-
-                newFileContent.AddRange(contentFile.Take(update.Index));
-                newFileContent.Add(update.Content ?? "");
-                newFileContent.AddRange(contentFile.TakeLast(contentFile.Count - (update.Index)));
-
-                file.Content = newFileContent;
-            }
-
-            var save = await _dbContext.SaveChangesAsync();
+            file.Content = update.Content;
+            await _dbContext.SaveChangesAsync();
 
             return ActionResultService.Results.Update;
         }
 
         return ActionResultService.Results.NotFound;
-    }   
-
-    public async Task<ActionResultService.Results> UpdateFileUpdateContent(string title, string pin, ushort fileId, UpdateFileContentDto update)
-    {
-        var file = await _dbContext.Files
-             .FirstOrDefaultAsync(f => (f.Id == fileId) && (f.Page.Title == title) && (f.Page.Pin == pin));
-
-        if (file != null)
-        {
-            if (file.Content.Count >= update.Index)
-            {
-                file.Content[update.Index] = update.Content ?? "";
-            }
-            else file.Content.Add(update.Content ?? "");
-
-            var save = await _dbContext.SaveChangesAsync();
-
-            return (save > 0)
-                ? ActionResultService.Results.Update
-                : ActionResultService.Results.ServerError;
-        }
-
-        return ActionResultService.Results.NotFound;
     }
 
-    public async Task<ActionResultService.Results> UpdateFileRemoveLine(string title, string pin, ushort fileId, UpdateFileContentDto update)
-    {
-        var file = await _dbContext.Files
-             .FirstOrDefaultAsync(f => (f.Id == fileId) && (f.Page.Title == title) && (f.Page.Pin == pin));
-
-        if (file != null)
-        {
-            int save;
-
-            if (file.Content.Count > 1)
-            {
-                var list = file.Content.ToList();
-                list.RemoveAt(update.Index);
-
-                file.Content = [.. list];
-                save = await _dbContext.SaveChangesAsync();
-
-                return (save > 0)
-                    ? ActionResultService.Results.Update
-                    : ActionResultService.Results.ServerError;
-            }
-
-            file.Content = [""];
-            save = await _dbContext.SaveChangesAsync();
-
-            return ActionResultService.Results.Update;
-
-        }
-
-        return ActionResultService.Results.NotFound;
-    }
-
-
-    //DELETE file
+    //Delets
     public async Task<ActionResultService.Results> DeleteFile(string title, string pin, ushort fileId)
     {
         var file = await _dbContext.Files
