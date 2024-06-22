@@ -88,12 +88,17 @@ public class PageRepository
 
         if (page != null)
         {
-            page.Theme = newTheme;
-            var save = await _dbContext.SaveChangesAsync();
+            if (page.Theme != newTheme)
+            {
+                page.Theme = newTheme;
+                var save = await _dbContext.SaveChangesAsync();
 
-            return (save > 0)
-                ? ActionResultService.Results.Update
-                : ActionResultService.Results.ServerError;
+                return (save > 0)
+                    ? ActionResultService.Results.Update
+                    : ActionResultService.Results.ServerError;
+            }
+
+            return ActionResultService.Results.Update;
         }
 
         return ActionResultService.Results.NotFound;

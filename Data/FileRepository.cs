@@ -43,7 +43,6 @@ public class FileRepository
         if (page != null)
         {
             FileModel newFile = new(newFileTitle, page.Id, page);
-            newFile.Content.Add("");
             var fileCreated = _dbContext.Files.Add(newFile);
 
             var save = await _dbContext.SaveChangesAsync();
