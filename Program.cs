@@ -16,7 +16,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll",
         builder =>
         {
-            builder.WithOrigins("https://wesleytelesbenette.github.io/fw-secure-notes/")
+            builder.WithOrigins("https://wesleytelesbenette.github.io/fw-secure-notes")
                    .AllowAnyHeader()
                    .AllowAnyMethod()
                    .AllowCredentials();
