@@ -84,6 +84,7 @@ public class PageRepository
             - **Barra de Ferramentas**: Nela você pode encontrar opções como: Modo visualização, ajuda, copiar link da página, configurações e deslogar da página, respectivamente.
             -- Copiar o Link da página é a forma mais eficiente de acessar ela depois, para não precisar decorar seu PIN.
             -- O PIN pode ser visualizado nas configurações, mas também no próprio título da página (logo após o nome que você deu à página, tem um PIN de 3 caracteres).
+            -- Nas configurações você pode realizar mais algumas ações, como: escolher o tema de cor da página, trocar a senha, deletar a página.
             Ps. Você pode ter uma explicação mais detalhada no [Repositório do Projeto](https://github.com/WesleyTelesBenette/fw-secure-notes).
             # Estilização 🎨
             ---
@@ -104,7 +105,7 @@ public class PageRepository
             - ### tamanhos
             ## Criar Listas
             Listas de itens, com 3 níveis de subitens.
-            - Listas
+            - Lista
             -- Subitem 1
             --- Subitem 2
             ---- Subitem 3
