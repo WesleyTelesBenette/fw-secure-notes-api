@@ -22,6 +22,12 @@ public class FileModel
 
     public FileModel() { }
 
+    public FileModel(string title, string content)
+    {
+        this.Title = title;
+        this.Content = content;
+    }
+
     public FileModel(string title, uint pageId, PageModel page)
     {
         Title = title;
