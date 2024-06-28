@@ -20,9 +20,9 @@ public class AuthenticationRepository
 
         if (page != null)
         {
-            return (!string.IsNullOrEmpty(page.Password))
-                ? ActionResultService.Results.Get
-                : ActionResultService.Results.NoContent;
+            return (BCrypt.Net.BCrypt.Verify("", page.Password))
+                ? ActionResultService.Results.NoContent
+                : ActionResultService.Results.Get;
         }
 
         return ActionResultService.Results.NotFound;

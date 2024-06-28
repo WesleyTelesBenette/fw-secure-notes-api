@@ -29,8 +29,10 @@ public class AuthenticationController : Controller
         try
         {
             var result = await _auth.GetPageConfig(title, pin);
+            bool valueResult = (result == ActionResultService.Results.Get);
 
-            return _result.GetActionAuto(result, "Page", true);
+
+            return _result.GetActionAuto(result, "Page", valueResult);
         }
         catch (Exception e)
         {
