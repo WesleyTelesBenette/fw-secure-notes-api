@@ -11,30 +11,32 @@ Um sistema Backend, responsável por intermediar a comunicação entre a aplica�
 - Tenha o [.NET](https://dotnet.microsoft.com/pt-br/download/dotnet/8.0) instalado, na versão 8 obviamente.
 
 ### Execução
-- ```bash
-  # Clone o repositório
-  git clone https://github.com/WesleyTelesBenette/fw-secure-notes-api.git
-  ```
-- ```bash
-  # Acesse a pasta do projeto
-  cd fw-secure-notes-api
-  ```
-- ```bash
-  # Instale as dependências
-  dotnet restore
-  ```
+```bash
+# Clone o repositório
+git clone https://github.com/WesleyTelesBenette/fw-secure-notes-api.git
+```
+```bash
+# Acesse a pasta do projeto
+cd fw-secure-notes-api
+```
+```bash
+# Instale as dependências
+dotnet restore
+```
 - Altere o CORS na linha 19 do arquivo "Program.cs". Troque "https://wesleytelesbenette.github.io" pelo endereço do seu servidor (provavelmente "http://localhost").
 
-- ```bash
-  # Compile e rode a aplicação
-  dotnet build
-  dotnet run
-  ```
+```bash
+# Compile e rode a aplicação
+dotnet build
+dotnet run
+```
 
 ## 🏬 Padrão de Arquitetura
 A arquitetura talvez seja uma das mais simples e utilizadas globalmente, o famoso: ***MVC***.
 
-Por ser uma API simples, mas não tão pequena a ponto de a definir como um microsserviço, foi preferível adotar esse modelo de implementação. O fato do sistema se resumir ao gerenciamento de uma base de dados, e precisar de várias rotas e modelos, faz com que o padrão parecça fornecer a medida certa de complexidade que o projeto precisa.
+![](https://github.com/WesleyTelesBenette/my-sources-for-docs/blob/main/fw-secure-notes/mvc.svg)
+
+Por ser uma API simples, mas não tão pequena a ponto de a definir como um microsserviço, foi preferível adotar esse modelo de implementação. O fato do sistema se resumir ao gerenciamento de uma base de dados, e precisar de várias rotas e modelos, faz com que o padrão pareça fornecer a medida certa de complexidade que o projeto precisa.
 
 ## 📡 Comunicação com a API
 
