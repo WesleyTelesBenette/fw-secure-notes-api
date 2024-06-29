@@ -23,6 +23,8 @@ cd fw-secure-notes-api
 # Instale as dependências
 dotnet restore
 ```
+- Altere o CORS na linha 19 do arquivo "Program.cs". Troque "https://wesleytelesbenette.github.io" pelo endereço do seu servidor (provavelmente "http://localhost").
+
 ```bash
 # Compile e rode a aplicação
 dotnet build
@@ -32,7 +34,9 @@ dotnet run
 ## 🏬 Padrão de Arquitetura
 A arquitetura talvez seja uma das mais simples e utilizadas globalmente, o famoso: ***MVC***.
 
-Por ser uma API simples, mas não tão pequena a ponto de a definir como um microsserviço, foi preferível adotar esse modelo de implementação. O fato do sistema se resumir ao gerenciamento de uma base de dados, e precisar de várias rotas e modelos, faz com que o padrão parecça fornecer a medida certa de complexidade que o projeto precisa.
+![](https://github.com/WesleyTelesBenette/my-sources-for-docs/blob/main/fw-secure-notes/mvc.svg)
+
+Por ser uma API simples, mas não tão pequena a ponto de a definir como um microsserviço, foi preferível adotar esse modelo de implementação. O fato do sistema se resumir ao gerenciamento de uma base de dados, e precisar de várias rotas e modelos, faz com que o padrão pareça fornecer a medida certa de complexidade que o projeto precisa.
 
 ## 📡 Comunicação com a API
 
@@ -43,23 +47,23 @@ Por ser uma API simples, mas não tão pequena a ponto de a definir como um micr
 As rotas com 🔒 precisam de autenticação JWT, e as ☑️ não tem nenhum controle de acesso além do próprio CORS.
 
 #### Authentication
-- ☑️ **GET**: "/Authentication/{title}/{pin}/password"
-- ☑️ **GET**: "/Authentication/{title}/{pin}/validate"
-- ☑️ **POST**: "/Authentication/{title}/{pin}"
+- ☑️ **GET**: "/Authentication/{title}/{pin}/password" - Retorna se uma página tem senha (bool).
+- 🔒 **GET**: "/Authentication/{title}/{pin}/validate" - Retorna se o token está autenticado.
+- ☑️ **POST**: "/Authentication/{title}/{pin}" - Criar um Token JWT, com o corpo de [LoginDto](Dtos/General/LoginDto.cs).
 
 #### File
-- 🔒 **GET**: "/File/{title}/{pin}/{fileId}"
-- 🔒 **POST**: "/File/{title}/{pin}"
-- 🔒 **PUT**: "/File/{title}/{pin}/{fileId}/title"
-- 🔒 **PUT**: "/File/{title}/{pin}/{fileId}/content"
-- 🔒 **DELETE**: "/File/{title}/{pin}/{fileId}"
+- 🔒 **GET**: "/File/{title}/{pin}/{fileId}" - Retorna um objeto [FileModelDto](Dtos/File/FileModelDto.cs).
+- 🔒 **POST**: "/File/{title}/{pin}" - Criar um Arquivo, com corpo de [CreateFileDto](Dtos/File/CreateFileDto.cs).
+- 🔒 **PUT**: "/File/{title}/{pin}/{fileId}/title" - Atualiza o título de um Arquivo, com corpo de [UpdateFileTitleDto](Dtos/File/UpdateFileTitleDto.cs).
+- 🔒 **PUT**: "/File/{title}/{pin}/{fileId}/content" - Atualiza o conteúdo de um Arquivo, com corpo de [UpdateFileContentDto](Dtos/File/UpdateFileContentDto.cs).
+- 🔒 **DELETE**: "/File/{title}/{pin}/{fileId}" - Exclui um Arquivo.
 
 #### Page
-- ☑️ **GET**: "/Page/{title}/{pin}/exist"
-- 🔒 **GET**: "/Page/{title}/{pin}/files"
-- 🔒 **GET**: "/Page/{title}/{pin}/theme"
-- ☑️ **POST**: "/Page"
-- 🔒 **PUT**: "/Page/{title}/{pin}/password"
-- 🔒 **PUT**: "/Page/{title}/{pin}/theme"
-- 🔒 **DELETE**: "/Page/{title}/{pin}"
+- ☑️ **GET**: "/Page/{title}/{pin}/exist" - Retorna se a Página existe (bool).
+- 🔒 **GET**: "/Page/{title}/{pin}/files" - Retorna uma lista com os arquivos da Página (array de [FileModelDto](Dtos/File/FileModelDto.cs)).
+- 🔒 **GET**: "/Page/{title}/{pin}/theme" - Retorna o tema de cores atual da Página (int).
+- ☑️ **POST**: "/Page" - Cria uma Página, com corpo de [CreatePageDto](Dtos/Page/CreatePageDto.cs).
+- 🔒 **PUT**: "/Page/{title}/{pin}/password" - Atualiza a senha da Página, com corpo de [UpdatePagePasswordDto](Dtos/Page/UpdatePagePasswordDto.cs).
+- 🔒 **PUT**: "/Page/{title}/{pin}/theme" - Atualiza o tema de cores da Página, com corpo de [UpdatePageThemeDto](Dtos/Page/UpdatePageThemeDto.cs).
+- 🔒 **DELETE**: "/Page/{title}/{pin}" - Exclui uma Página.
 
