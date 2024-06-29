@@ -38,7 +38,7 @@ public class PageRepository
                 (p.Title == title) &&
                 (p.Pin == pin));
 
-        return (page != null) && (!string.IsNullOrEmpty(page.Password));
+        return (page != null) && (BCrypt.Net.BCrypt.Verify("", page.Password) == false);
     }
 
 
